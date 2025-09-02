@@ -1,0 +1,124 @@
+---
+title: "Assessment 4"
+author: "Julia Lay"
+date: "2025-09-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 1
+
+### Gene Expression Analysis
+
+#### 1. Read in the file and show table with first six genes
+Read in the file “gene_expression.tsv” making the gene identifiers the row names. 
+Show a table of values for the first six genes.
+
+```{r}
+# Read in data (tab separated)
+gene_data <- read.table("gene_expression.tsv", header = TRUE, row.names = 1, sep = "\t")
+
+# Show first six rows
+head(gene_data)
+```
+
+#### 2. Add mean column
+
+Make a new column which is the mean of the other columns. Show a table of values for the first six genes.
+
+```{r}
+gene_data$mean <- rowMeans(gene_data)
+head(gene_data)
+```
+
+#### 3. List top 10 genes with highest mean expression
+
+```{r}
+top_genes <- head(gene_data[order(-gene_data$mean), ], 10)
+top_genes
+```
+
+
+#### 4. Determine the number of genes with a mean <10
+
+```{r}
+low_mean_count <- sum(gene_data$mean < 10)
+low_mean_count
+```
+
+#### 5. Make a histogram plot of the mean values and include it into your report.
+
+```{r}
+hist(gene_data$mean, main = "Histogram of Mean Gene Expression", xlab = "Mean Expression")
+```
+### Growth Data Analysis
+
+#### 6. Import this csv file into an R object. What are the column names?
+```{r}
+growth_data <- read.csv("growth_data.csv", header = TRUE)
+colnames(growth_data)
+```
+
+#### 7. Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
+Sites are "northeast" or "southwest". Columns suggest start of study is 2005 and end of study is 2020
+
+```{r}
+stats <- data.frame(
+  Site = unique(growth_data$Site),
+  mean_2005 = tapply(growth_data$Circumf_2005_cm, growth_data$Site, mean),
+  sd_2005   = tapply(growth_data$Circumf_2005_cm, growth_data$Site, sd),
+  mean_2020 = tapply(growth_data$Circumf_2020_cm, growth_data$Site, mean),
+  sd_2020   = tapply(growth_data$Circumf_2020_cm, growth_data$Site, sd)
+)
+stats
+```
+#### 8. Make a box plot of tree circumference at the start and end of the study at both sites.
+```{r}
+# Create combined vector of circumference values
+circumference <- c(growth_data$Circumf_2005_cm, growth_data$Circumf_2020_cm)
+
+# Create corresponding Site labels
+site <- rep(growth_data$Site, 2)
+
+# Create corresponding Year labels
+year <- c(rep("2005", nrow(growth_data)), rep("2020", nrow(growth_data)))
+
+# Combine Site and Year into one factor
+site_year <- interaction(site, year)
+
+# Make nicer labels
+levels(site_year) <- c("Northeast 2005", "Southwest 2005",
+                       "Northeast 2020", "Southwest 2020")
+
+# Box plot
+boxplot(circumference ~ site_year,
+        main = "Tree Circumference at Start (2005) and End (2020)",
+        xlab = "Site and Year",
+        ylab = "Circumference (cm)",
+        col = c("plum1", "deepskyblue", "plum1", "deepskyblue"))
+```
+
+
+#### 9. Calculate the mean growth over the last 10 years at each site.
+It looks like 
+Northeast site: 42.94 cm
+Southwest site: 35.49 cm
+So, on average, trees at the northeast site grew ~7.45 cm more over the last 10 years than trees at the southwest site.
+```{r}
+# Calculate 10-year growth per tree using 2020 and 2010
+growth_data$growth10yr <- growth_data$Circumf_2020_cm - growth_data$Circumf_2010_cm
+
+# Mean growth per site
+aggregate(growth10yr ~ Site, data = growth_data, mean)
+```
+
+#### 10. Use the t.test to estimate the p-value that the 10 year growth is different at the two sites.
+A Welch two-sample t-test indicated that this difference was not statistically significant (t = 1.8882, df = 87.978, p = 0.06229), with a 95% confidence interval of -0.39 to 15.29 cm. The p-value is slightly above the common significance threshold of 0.05.
+
+```{r}
+t.test(growth10yr ~ Site, data = growth_data)
+```
+
