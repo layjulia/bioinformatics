@@ -45,6 +45,8 @@ top_genes
 
 #### 4. Determine the number of genes with a mean <10
 
+Create variable low_mean_count and store the total number of mean values <10. When returning the low_mean_count value, we receive 35988 genes with a mean <10.
+
 ```{r}
 low_mean_count <- sum(gene_data$mean < 10)
 low_mean_count
@@ -52,8 +54,9 @@ low_mean_count
 
 #### 5. Make a histogram plot of the mean values and include it into your report.
 
+
 ```{r}
-hist(gene_data$mean, main = "Histogram of Mean Gene Expression", xlab = "Mean Expression")
+hist(gene_data$mean, breaks = 100, xlim = c(0, 550000), ylim = c(0, 60000), main = "Histogram of Mean Gene Expression", xlab = "Mean Expression")
 ```
 
 
