@@ -9,13 +9,12 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Part 1
+## Part 1: Importing files, data wrangling, mathematical operations, plots and saving code on GitHub
 
 ### Gene Expression Analysis
 
 #### 1. Read in the file and show table with first six genes
-Read in the file “gene_expression.tsv” making the gene identifiers the row names. 
-Show a table of values for the first six genes.
+The below reads in the file “gene_expression.tsv” making the gene identifiers the row names. The head() function in R then displays a table of values for the first six genes. By default, head() shows 6 rows but we could also specify the rows through "head(gene_data, n=6)".
 
 ```{r}
 # Read in data (tab separated)
@@ -27,7 +26,7 @@ head(gene_data)
 
 #### 2. Add mean column
 
-Make a new column which is the mean of the other columns. Show a table of values for the first six genes.
+We make a new column which is the mean of the other columns. The first six genes is displayed again through the head() function.
 
 ```{r}
 gene_data$mean <- rowMeans(gene_data)
@@ -35,6 +34,8 @@ head(gene_data)
 ```
 
 #### 3. List top 10 genes with highest mean expression
+
+The top 10 genes with the highest mean expression is shown.
 
 ```{r}
 top_genes <- head(gene_data[order(-gene_data$mean), ], 10)
@@ -54,6 +55,8 @@ low_mean_count
 ```{r}
 hist(gene_data$mean, main = "Histogram of Mean Gene Expression", xlab = "Mean Expression")
 ```
+
+
 ### Growth Data Analysis
 
 #### 6. Import this csv file into an R object. What are the column names?
@@ -122,3 +125,4 @@ A Welch two-sample t-test indicated that this difference was not statistically s
 t.test(growth10yr ~ Site, data = growth_data)
 ```
 
+## Part 2: Examining biological sequence diversity
