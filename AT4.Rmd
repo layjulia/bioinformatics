@@ -173,24 +173,105 @@ cds_table <- data.frame(
 
 cds_table
 ```
+E. coli has around 837 more coding sequences than A. aceti.
+
 
 #### 2. How much coding DNA is there in total for these two organisms? Present this in the form of a table. Describe any differences between the two organisms.
 
 ```{r}
-
+head(summary(aaceti_cds))
 ```
+We want all rows and first column in the cds files to be summed. This is the total length of all genes.
+```{r}
+# Total coding DNA from the length column
+ecoli_len <- as.numeric(summary(ecoli_cds)[,1])
+aaceti_len <- as.numeric(summary(aaceti_cds)[,1])
 
+#this is q2 or 3?
+# Sum of all the lengths within the organism 
+ecoli_total <- sum(ecoli_len)
+aaceti_total <- sum(aaceti_len)
+
+# Create table
+DNA_total <- data.frame(
+  Organism = c("E. coli", "A. aceti"),
+  Total_DNA = c(ecoli_total, aaceti_total)
+)
+
+# Print table
+DNA_total
+```
+The total coding DNA in E. coli is about 740000 base pairs greater than in A. aceti. This difference is consistent with its larger number of genes as noted in section 1.
 
 #### 3. Calculate the length of all coding sequences in these two organisms. Make a boxplot of coding sequence length in these organisms. What is the mean and median coding sequence length of these two organisms? Describe any differences between the two organisms.
 
 ```{r}
+# Boxplot of CDS lengths - check if this is ecoli_len or is it the sum (ecoli_total)
+boxplot(list("E. coli" = ecoli_len, "A. aceti" = aaceti_len),
+        main = "Distribution of coding sequence lengths (box plot)",
+        ylab = "Sequence Length (bp)",
+        col = c("skyblue", "plum"))
 
+# Calculate mean and median CDS length
+cds_stats <- data.frame(
+  Organism = c("E. coli", "A. aceti"),
+  Mean_CDS_Length = c(mean(ecoli_len), mean(aaceti_len)),
+  Median_CDS_Length = c(median(ecoli_len), median(aaceti_len))
+)
+
+# Print table to show means and medians
+cds_stats
 ```
+On average, A.aceti coding sequences are longer than those in E. coli (approximately 12 bp difference) but this is very small relative to the overall sequence length and might not be biologically significant.
 
+The median coding sequence length is also longer in E. coli (831 bp vs 819 bp), which suggests that E. coli has a slightly more balanced distribution of gene lengths, whereas A. aceti may have a few longer genes that increase its mean.
+
+The fact that A. aceti has a higher mean but a lower median implies its coding sequence length distribution might be more skewed, with some unusually long genes pulling the mean upward.
 
 #### 4. Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence. Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.
 
 ```{r}
+# --DNA base frequencies 
+# # Extract first element of the ecoli list (first gene) - GC content of it would be the proportion of the gene with Gs or Cs
+# GC(ecoli_cds[[1]])
+# GC(aaceti_cds[[1]])
+# 
+# #count the number of each nucleotide present in this gene, count the combination of 1 of each
+# count(ecoli_cds[[1]],1)
+# count
+# 
+# #To count the whole genome we have to unlist
+# GC(unlist(ecoli_cds))
+
+# ---- start actual stuff here
+
+# Concatenate all CDS into one sequence per organism
+ecoli_seq <- unlist(ecoli_cds)
+aaceti_seq <- unlist(aaceti_cds)
+
+# Count combinations of 1s of the nucleotides in entire DNA
+ecoli_dna_composition <- count(ecoli_seq,1)
+aaceti_dna_composition <- count(aaceti_seq,1)
+# Relative frequencies
+ecoli_nt_freq <- ecoli_dna_composition/sum(ecoli_dna_composition)
+aaceti_nt_freq <- aaceti_dna_composition/sum(aaceti_dna_composition)
+
+ecoli_nt_freq 
+aaceti_nt_freq
+
+#Barplots
+barplot(ecoli_dna_composition, xlab="Nucleotides", ylab="Frequency", main="E. coli CDS composition")
+barplot(aaceti_dna_composition, xlab="Nucleotides", ylab="Frequency", main="A. aceti CDS composition")
+
+#We can also plot our nucleotide frequencies
+barplot(ecoli_nt_freq , xlab="Nucleotides", ylab="Proportion", main="E. coli CDS composition")
+grid()
+barplot(aaceti_nt_freq, xlab="Nucleotides", ylab="Proportion", main="A. aceti CDS composition")
+grid()
+
+
+#translation
+
 
 ```
 
