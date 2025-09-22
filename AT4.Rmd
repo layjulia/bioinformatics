@@ -1,7 +1,7 @@
 ---
 title: "Assessment 4"
 author: "Julia Lay"
-date: "2025-09-02"
+date: "2025-09-22"
 output: html_document
 ---
 
@@ -144,27 +144,16 @@ Placeholder:
 * Describe how you solved the problem. 
 * Provide the answer or answers as directed. The answers could include numerical or categorical data, tables or charts.
 
-<<<<<<< HEAD
 Load packages needed:
-=======
-Packages needed:
->>>>>>> ba1b27a9126af83ec60387c7247d2ab0ac9262f9
 ```{r loading packages}
 suppressPackageStartupMessages({
   library("seqinr") # is a package designed to process and analyse sequence data.
   library("R.utils") # general utilities like zip and unzip
-<<<<<<< HEAD
   library("ggplot2") #for graphs
-=======
->>>>>>> ba1b27a9126af83ec60387c7247d2ab0ac9262f9
 })
 ```
 
 Download both E. coli (GCA_000005845) and A. aceti (GCA_002005445) from Ensembl
-<<<<<<< HEAD
-=======
-
->>>>>>> ba1b27a9126af83ec60387c7247d2ab0ac9262f9
 ```{r}
 #E. coli
 URL="https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
@@ -226,11 +215,7 @@ The total coding DNA in E. coli is about 740000 base pairs greater than in A. ac
 boxplot(list("E. coli" = ecoli_len, "A. aceti" = aaceti_len),
         main = "Distribution of coding sequence lengths (box plot)",
         ylab = "Sequence Length (bp)",
-<<<<<<< HEAD
         col = c("skyblue", "plum1"))
-=======
-        col = c("skyblue", "plum"))
->>>>>>> ba1b27a9126af83ec60387c7247d2ab0ac9262f9
 
 # Calculate mean and median CDS length
 cds_stats <- data.frame(
@@ -250,26 +235,8 @@ The fact that A. aceti has a higher mean but a lower median implies its coding s
 
 #### 4. Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence. Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.
 
-<<<<<<< HEAD
 Frequency of DNA bases per organism. To count the entire genome we use `unlist`.
 ```{r}
-=======
-```{r}
-# --DNA base frequencies 
-# # Extract first element of the ecoli list (first gene) - GC content of it would be the proportion of the gene with Gs or Cs
-# GC(ecoli_cds[[1]])
-# GC(aaceti_cds[[1]])
-# 
-# #count the number of each nucleotide present in this gene, count the combination of 1 of each
-# count(ecoli_cds[[1]],1)
-# count
-# 
-# #To count the whole genome we have to unlist
-# GC(unlist(ecoli_cds))
-
-# ---- start actual stuff here
-
->>>>>>> ba1b27a9126af83ec60387c7247d2ab0ac9262f9
 # Concatenate all CDS into one sequence per organism
 ecoli_seq <- unlist(ecoli_cds)
 aaceti_seq <- unlist(aaceti_cds)
@@ -284,7 +251,6 @@ aaceti_nt_freq <- aaceti_dna_composition/sum(aaceti_dna_composition)
 ecoli_nt_freq 
 aaceti_nt_freq
 
-<<<<<<< HEAD
 #Barplots. `las=1` to make the labels horizontal only
 barplot(ecoli_dna_composition, 
         xlab="Nucleotides", 
@@ -550,39 +516,14 @@ ggplot(rscu_all, aes(x = Codon, y = Organism, fill = RSCU)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   labs(title = "Codon Usage Bias Heatmap (RSCU values)",
        x = "Codon", y = "Organism")
-=======
-#Barplots
-barplot(ecoli_dna_composition, xlab="Nucleotides", ylab="Frequency", main="E. coli CDS composition")
-barplot(aaceti_dna_composition, xlab="Nucleotides", ylab="Frequency", main="A. aceti CDS composition")
-
-#We can also plot our nucleotide frequencies
-barplot(ecoli_nt_freq , xlab="Nucleotides", ylab="Proportion", main="E. coli CDS composition")
-grid()
-barplot(aaceti_nt_freq, xlab="Nucleotides", ylab="Proportion", main="A. aceti CDS composition")
-grid()
-
-
-#translation
-
-
-```
-
-
-#### 5. Create a codon usage table and quantify the codon usage bias among all coding sequences. Describe any differences between the two organisms with respect to their codon usage bias. Provide charts to support your observations.
-
-```{r}
->>>>>>> ba1b27a9126af83ec60387c7247d2ab0ac9262f9
 
 ```
 
 
 #### 6. In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in your organism of interest. Are these k-mers also over- and under-represented in E. coli to a similar extent? Provide plots to support your observations. Why do you think these sequences are present at different levels in the genomes of these organisms?
 
-<<<<<<< HEAD
 Before we already translated the CDS to protein sequences...
 K-mer is simply a short sequence string of length k. We can use k-mer analysis to identify particular sequences that are over- or under-represented in an organism.
-=======
->>>>>>> ba1b27a9126af83ec60387c7247d2ab0ac9262f9
 ```{r}
 
 ```
