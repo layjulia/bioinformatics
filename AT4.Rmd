@@ -149,7 +149,7 @@ Load packages needed:
 suppressPackageStartupMessages({
   library("seqinr") # is a package designed to process and analyse sequence data.
   library("R.utils") # general utilities like zip and unzip
-  library("ggplot2") #for graphs
+  library("ggplot2") # for graphs
 })
 ```
 
@@ -286,13 +286,32 @@ E. coli: more balanced between A/T (both ~24%) and G/C (~25–27%).
 A. aceti: relatively GC-rich, with higher C (28%) and G (29.6%) but lower A (20%) and T (21.8%).
 This indicates that A. aceti has a higher GC content compared to E. coli, which could influence genome stability, codon usage, and gene expression.
 
-Calculate the frequency of protein sequences for both organisms. 
+
+## Translation shows the protein sequence of the genes
 ```{r}
-#translation shows the protein sequence of the genes
 #unlist and use lapply to translate entire genome
 ecoli_prot <- unlist(lapply(ecoli_cds, translate))
 aaceti_prot <- unlist(lapply(aaceti_cds, translate))
+```
 
+
+We can use the prot list to get any useful information, such as the number of unique amino acids. aa <- unique(prot[[2]]) extracts these amino acids, aa <- aa[aa != "*"] removes any asterisks for unknown amino acids, and length(aa) counts the remaining unique amino acids.
+```{r}
+aa <- unique(ecoli_prot)
+aa <- aa[aa != "*"]
+length(aa)
+
+aa1 <- unique(aaceti_prot)
+aa1 <- aa1[aa1 != "*"]
+length(aa1)
+
+count(ecoli_prot,wordsize=1,alphabet=aa)
+count(aaceti_prot,wordsize=1,alphabet=aa1)
+```
+
+
+Calculate the frequency of protein sequences for both organisms. 
+```{r}
 # Count amino acids
 ecoli_aa_freq <- table(ecoli_prot)
 aaceti_aa_freq <- table(aaceti_prot)
@@ -335,6 +354,7 @@ barplot(aaceti_aa_proportion,
 grid()
 
 ```
+
 
 Checking only - do we want a table to compare?
 ```{r}
@@ -388,7 +408,25 @@ ecoli_codon
 aaceti_codon
 ```
 
-However, it is better if we could look at the RSCU side by side.
+We can also display bar plots to visualise codon usage
+`las=2` to keep it vertical
+The red dashed line at RSCU = 1 shows where codons would be equally used
+```{r}
+
+#store as non-dataframe for below graphs
+ecoli_rscu <- uco(unlist(ecoli_cds),index="rscu")
+aaceti_rscu <- uco(unlist(aaceti_cds), index = "rscu")
+
+barplot(ecoli_rscu, las=2, cex.names=0.6,
+        main="E. coli RSCU", ylab="RSCU", col="skyblue")
+abline(h=1, col="red", lty=2)
+
+barplot(aaceti_rscu, las=2, cex.names=0.6,
+        main="A. aceti RSCU", ylab="RSCU", col="plum1")
+abline(h=1, col="red", lty=2)
+```
+
+However, it is better if we could look at the RSCU of both organisms side by side.
 We can combine `ecoli_codon` and `aaceti_codon` into one table with the amino acid and codon columns.
 ```{r}
 # Make sure RSCU columns have unique names
@@ -410,8 +448,7 @@ rscu_table
 
 
 ###Visualising codon usage bias
-`las=2` to keep it vertical
-The red dashed line at RSCU = 1 shows where codons would be equally used
+
 
 ```{r}
 # Create a matrix of RSCU values: rows = organisms, cols = codons
@@ -474,21 +511,7 @@ abline(h = 1, col = "red", lty = 2, lwd = 2)
 abline(v = bp[1, aa_positions], col = "grey50", lty = 3)
 ```
 
-Put this graph in front?
-```{r}
 
-#store as non-dataframe for below graphs
-ecoli_rscu <- uco(unlist(ecoli_cds),index="rscu")
-aaceti_rscu <- uco(unlist(aaceti_cds), index = "rscu")
-
-barplot(ecoli_rscu, las=2, cex.names=0.6,
-        main="E. coli RSCU", ylab="RSCU", col="skyblue")
-abline(h=1, col="red", lty=2)
-
-barplot(aaceti_rscu, las=2, cex.names=0.6,
-        main="A. aceti RSCU", ylab="RSCU", col="plum1")
-abline(h=1, col="red", lty=2)
-```
 Are we allowed to use a heatmap for codon bias using ggplot2?
 ```{r}
 # Convert to data frames to prepare for heat map (different to the rscu_table)
@@ -525,6 +548,53 @@ ggplot(rscu_all, aes(x = Codon, y = Organism, fill = RSCU)) +
 Before we already translated the CDS to protein sequences...
 K-mer is simply a short sequence string of length k. We can use k-mer analysis to identify particular sequences that are over- or under-represented in an organism.
 ```{r}
+#we counted unique aa in ecoli earlier and stored as aa (E. coli) and aa1 (A. aceti)
 
+# Example for 3 k-mers
+ecoli_kmer <- unlist(ecoli_prot)
+aaceti_kmer <- unlist(aaceti_prot)
+
+ecoli_k3 <- count(ecoli_kmer,wordsize=3,alphabet=aa)
+aaceti_k3 <- count(aaceti_kmer,wordsize=3,alphabet=aa1)
+
+#check
+head(ecoli_k3)
+head(aaceti_k3)
+
+#Convert counts to frequency so the different proteome sizes don't bias the comparison
+ecoli_k3_freq <- count(ecoli_kmer,wordsize=3,alphabet=aa,freq=TRUE)
+head(ecoli_k3_freq)
+aaceti_k3_freq <- count(aaceti_kmer,wordsize=3,alphabet=aa1,freq=TRUE)
+head(aaceti_k3_freq)
+
+```
+```{r}
+k3_table <- data.frame(
+    Ecoli = ecoli_k3_freq,
+  Aaceti = aaceti_k3_freq
+)
+
+k3_table
+```
+Finding the top 10 over and under represented k-mers in A. aceti for length 3
+This just plots the bar graph with both top and bottom -Can separate this if it looks better?
+
+Still yet to: "Are these k-mers also over- and under-represented in E. coli to a similar extent?"
+We could pull out the same kmers as the k3_table would have e. coli 
+```{r}
+over_k3_aaceti <- head(k3_table[order(-k3_table$Aaceti.Freq), ], 10)
+under_k3_aaceti <- head(k3_table[order(k3_table$Aaceti.Freq), ], 10)
+
+aaceti_top_k3 <- rbind(over_k3_aaceti, under_k3_aaceti)
+
+barplot(height = aaceti_top_k3$Aaceti.Freq,
+        names.arg = aaceti_top_k3$Aaceti.Var1,
+        col = "plum1",
+        las = 2,
+        ylab = "Frequency in A. aceti",
+        xlab = "3-kmers",
+        main = "Most over- and under-represented 3-kmers in A. aceti",
+        cex.names = 0.8)
+abline(h=0, lty=2, col="grey40")
 ```
 
