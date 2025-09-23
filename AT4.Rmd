@@ -404,8 +404,8 @@ ecoli_codon <- uco(unlist(ecoli_cds),index="rscu", as.data.frame = TRUE)
 aaceti_codon <- uco(unlist(aaceti_cds), index = "rscu", as.data.frame = TRUE)
 
 #View both tables
-ecoli_codon
-aaceti_codon
+head(ecoli_codon)
+head(aaceti_codon)
 ```
 
 We can also display bar plots to visualise codon usage
@@ -442,7 +442,7 @@ rscu_table <- merge(ecoli_codon[, c("codon", "AA", "RSCU_Ecoli")],
 rscu_table <- rscu_table[, c("codon", "AA", "RSCU_Ecoli", "RSCU_Aaceti")]
 
 # print table
-rscu_table
+head(rscu_table)
 
 ```
 
@@ -574,7 +574,7 @@ k3_table <- data.frame(
   Aaceti = aaceti_k3_freq
 )
 
-k3_table
+head(k3_table)
 ```
 Finding the top 10 over and under represented k-mers in A. aceti for length 3
 This just plots the bar graph with both top and bottom -Can separate this if it looks better?
