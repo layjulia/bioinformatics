@@ -6,8 +6,8 @@ This repo contains a demonstration of using Git with RStudio.
 * [HTML output](https://github.com/layjulia/bioinformatics/blob/main/AT4.html)
 
 ## Summary
-* Part 1: Importing files, data wrangling, mathematical operations, plots and saving code on GitHub
-* Part 2: Examining biological sequence diversity
+* [Part 1: Importing files, data wrangling, mathematical operations, plots and saving code on GitHub](https://github.com/layjulia/bioinformatics?tab=readme-ov-file#part-1-importing-files-data-wrangling-mathematical-operations-plots-and-saving-code-on-github)
+* [Part 2: Examining biological sequence diversity](https://github.com/layjulia/bioinformatics?tab=readme-ov-file#part-2-examining-biological-sequence-diversity)
 
 ### Part 1: Importing files, data wrangling, mathematical operations, plots and saving code on GitHub
 
