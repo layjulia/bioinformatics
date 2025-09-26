@@ -9,6 +9,20 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+##### First we load all packages needed mainly for Part 2 of this project. 
+Note that the `count()` function must be distinguished within code chunks as it exists in both `seqinr` and `dplyr`.
+```{r loading packages}
+suppressPackageStartupMessages({
+  library("seqinr") # is a package designed to process and analyse sequence data.
+  library("R.utils") # general utilities like zip and unzip
+  library("ggplot2") # for plotting graphs
+  library("dplyr") # For group_by() and mutate() 
+  library("patchwork") # to arrange plots
+  library("forcats") # for fct_rev()
+})
+```
+
+
 ## Part 1: Importing files, data wrangling, mathematical operations, plots and saving code on GitHub
 
 ### Gene Expression Analysis
@@ -68,13 +82,15 @@ hist(gene_data$mean,
 ### Growth Data Analysis
 
 #### 6. Import this csv file into an R object. What are the column names?
+The column names are printed using `colnames()` as follows. They are: "Site", "TreeID", "Circumf_2005_cm", "Circumf_2010_cm", "Circumf_2015_cm", and "Circumf_2020_cm".
+
 ```{r}
 growth_data <- read.csv("growth_data.csv", header = TRUE)
 colnames(growth_data)
 ```
 
 #### 7. Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
-Sites are "northeast" or "southwest". Columns suggest start of study is 2005 and end of study is 2020
+The sites available are either "northeast" or "southwest". Our columns suggest the start of the study period is 2005 and the end of the study is 2020. The below data frame contains a calculation of the mean and standard deviation for both sites at 2005 and 2020.
 
 ```{r}
 stats <- data.frame(
@@ -86,7 +102,9 @@ stats <- data.frame(
 )
 stats
 ```
+
 #### 8. Make a box plot of tree circumference at the start and end of the study at both sites.
+
 ```{r}
 # Create combined vector of circumference values
 circumference <- c(growth_data$Circumf_2005_cm, growth_data$Circumf_2020_cm)
@@ -114,16 +132,22 @@ boxplot(circumference ~ site_year,
 
 
 #### 9. Calculate the mean growth over the last 10 years at each site.
-It looks like 
-Northeast site: 42.94 cm
-Southwest site: 35.49 cm
-So, on average, trees at the northeast site grew ~7.45 cm more over the last 10 years than trees at the southwest site.
+It looks like the mean growth over the last 10 years at each site is:
+* Northeast site: 42.94 cm
+* Southwest site: 35.49 cm
+
 ```{r}
 # Calculate 10-year growth per tree using 2020 and 2010
 growth_data$growth10yr <- growth_data$Circumf_2020_cm - growth_data$Circumf_2010_cm
 
 # Mean growth per site
-aggregate(growth10yr ~ Site, data = growth_data, mean)
+growth_summary <- aggregate(growth10yr ~ Site, data = growth_data, mean)
+growth_summary 
+```
+
+So, on average, trees at the northeast site grew ~7.45 cm more over the last 10 years than trees at the southwest site.
+```{r}
+diff(growth_summary$growth10yr)
 ```
 
 #### 10. Use the t.test to estimate the p-value that the 10 year growth is different at the two sites.
@@ -138,19 +162,6 @@ As part of your assignment, you will study one of the following organisms and co
 
 ### Information
 Organism allocated: Acetobacter aceti (GCA_002005445)
-
-##### Load all packages needed for Part 2:
-Note that the `count()` function must be distinguished as it is in both `seqinr` and `dplyr`
-```{r loading packages}
-suppressPackageStartupMessages({
-  library("seqinr") # is a package designed to process and analyse sequence data.
-  library("R.utils") # general utilities like zip and unzip
-  library("ggplot2") # for plotting graphs
-  library("dplyr") # For group_by() and mutate() 
-  library("patchwork") # to arrange plots
-  library("forcats") # for fct_rev()
-})
-```
 
 #### 1. Download the whole set of coding DNA sequences for E. coli and your organism of interest. How many coding sequences are present in these organisms? Present this in the form of a table. Describe any differences between the two organisms. 
 Placeholder:
@@ -741,11 +752,19 @@ barplot(
 legend("topright", legend=c("A. aceti","E. coli"), fill=c("plum1","skyblue"))
 ```
 
-Using a function to summarise the above more efficiently
+
+Using a function to summarise the above more efficiently.
+What the below code chunk does:
+Pull out the 10 most frequent and 10 least frequent k-mers in A. aceti.
+Show how frequent (or rare) those same k-mers are in E. coli.
+This way we directly see whether the enrichment/depletion is specific to A. aceti or shared with E. coli.
+
+The below graphs:
+One for the top 10 (most over-represented)
+Another for the bottom 10 (most under-represented)
 ```{r}
-# Function to get top over/under-represented k-mers and plot:
-plot_kmer_comparison <- function(prot1, prot2, aa1, aa2, k = 3, top_n = 10,
-                                 org1_name="A. aceti", org2_name="E. coli") {
+plot_kmer_comparison_split <- function(prot1, prot2, aa1, aa2, k = 3, top_n = 10,
+                                       org1_name="A. aceti", org2_name="E. coli") {
   
   # Count k-mers (frequency)
   kmers1_freq <- seqinr::count(prot1, wordsize = k, alphabet = aa1, freq = TRUE)
@@ -759,37 +778,95 @@ plot_kmer_comparison <- function(prot1, prot2, aa1, aa2, k = 3, top_n = 10,
     stringsAsFactors = FALSE
   )
   
-  # Select top and bottom k-mers in organism 1
+  # Select top and bottom k-mers in A. aceti
   over_kmers  <- head(kmer_table[order(-kmer_table$Org1.Freq), ], top_n)
   under_kmers <- head(kmer_table[order(kmer_table$Org1.Freq), ], top_n)
   
-  # Combine
-  top_kmers <- rbind(over_kmers, under_kmers)
+  # Overrepresented plot
+  freq_matrix_over <- t(as.matrix(over_kmers[, c("Org1.Freq", "Org2.Freq")]))
+  colnames(freq_matrix_over) <- over_kmers$Kmer
   
-  # Create matrix for barplot
-  freq_matrix <- t(as.matrix(top_kmers[, c("Org1.Freq", "Org2.Freq")]))
-  colnames(freq_matrix) <- top_kmers$Kmer
-  
-  # Plot side-by-side comparison
   barplot(
-    freq_matrix,
+    freq_matrix_over,
     beside = TRUE,
     col = c("plum1", "skyblue"),
     las = 2,
     ylab = "Frequency",
     xlab = paste(k, "-mers", sep=""),
-    main = paste("Over/Under-represented", k, "-mers in", org1_name, "vs", org2_name),
+    main = paste("Top", top_n, "Over-represented", k, "-mers in", org1_name, "vs", org2_name),
     cex.names = 0.8
   )
-  
   legend("topright", legend = c(org1_name, org2_name), fill = c("plum1", "skyblue"))
-  abline(h=0, col="grey40", lty=2)
+  
+  # Underrepresented plot
+  freq_matrix_under <- t(as.matrix(under_kmers[, c("Org1.Freq", "Org2.Freq")]))
+  colnames(freq_matrix_under) <- under_kmers$Kmer
+  
+  barplot(
+    freq_matrix_under,
+    beside = TRUE,
+    col = c("plum1", "skyblue"),
+    las = 2,
+    ylab = "Frequency",
+    xlab = paste(k, "-mers", sep=""),
+    main = paste("Top", top_n, "Under-represented", k, "-mers in", org1_name, "vs", org2_name),
+    cex.names = 0.8
+  )
+  legend("topright", legend = c(org1_name, org2_name), fill = c("plum1", "skyblue"))
 }
 
-
-
-plot_kmer_comparison(aaceti_prot, ecoli_prot, aa1, aa, k=3)
-plot_kmer_comparison(aaceti_prot, ecoli_prot, aa1, aa, k=4)
-plot_kmer_comparison(aaceti_prot, ecoli_prot, aa1, aa, k=5)
-
+#call
+plot_kmer_comparison_split(aaceti_prot, ecoli_prot, aa1, aa, k=3)
+plot_kmer_comparison_split(aaceti_prot, ecoli_prot, aa1, aa, k=4)
+plot_kmer_comparison_split(aaceti_prot, ecoli_prot, aa1, aa, k=5)
 ```
+We can quantify the changes using a table with:
+k-mer
+frequency in A. aceti
+frequency in E. coli
+fold-change (A. aceti /E. coli) - check for div by 0
+```{r}
+#create function
+get_kmer_summary <- function(prot1, prot2, aa1, aa2, k = 3, top_n = 10,
+                             org1_name="A. aceti", org2_name="E. coli") {
+  
+  # Count k-mers (frequency)
+  kmers1_freq <- seqinr::count(prot1, wordsize = k, alphabet = aa1, freq = TRUE)
+  kmers2_freq <- seqinr::count(prot2, wordsize = k, alphabet = aa2, freq = TRUE)
+  
+  # Convert to data frame
+  kmer_table <- data.frame(
+    Kmer = names(kmers1_freq),
+    Org1.Freq = as.numeric(kmers1_freq),
+    Org2.Freq = as.numeric(kmers2_freq),
+    stringsAsFactors = FALSE
+  )
+  
+  # Add fold change (handle zeros)
+  kmer_table$FoldChange <- ifelse(kmer_table$Org2.Freq > 0,
+                                  kmer_table$Org1.Freq / kmer_table$Org2.Freq,
+                                  NA)
+  
+  # Select over- and under-represented k-mers in Org1
+  over_kmers  <- head(kmer_table[order(-kmer_table$Org1.Freq), ], top_n)
+  under_kmers <- head(kmer_table[order(kmer_table$Org1.Freq), ], top_n)
+  
+  # Combine into one summary table
+  summary_table <- rbind(
+    cbind(Type="Over-represented", over_kmers),
+    cbind(Type="Under-represented", under_kmers)
+  )
+  
+  return(summary_table)
+}
+
+#use function and print
+summary_3kmers <- get_kmer_summary(aaceti_prot, ecoli_prot, aa1, aa, k=3)
+summary_4kmers <- get_kmer_summary(aaceti_prot, ecoli_prot, aa1, aa, k=4)
+summary_5kmers <- get_kmer_summary(aaceti_prot, ecoli_prot, aa1, aa, k=5)
+print(summary_3kmers)
+print(summary_4kmers)
+print(summary_5kmers)
+```
+
+
