@@ -139,21 +139,24 @@ As part of your assignment, you will study one of the following organisms and co
 ### Information
 Organism allocated: Acetobacter aceti (GCA_002005445)
 
+##### Load all packages needed for Part 2:
+```{r loading packages}
+suppressPackageStartupMessages({
+  library("seqinr") # is a package designed to process and analyse sequence data.
+  library("R.utils") # general utilities like zip and unzip
+  library("ggplot2") # for plotting graphs
+  #library("dplyr") # For group_by() and mutate() - call this later as it disrupts seqinr::count
+  library("patchwork") # to arrange plots
+  library("forcats") # for fct_rev()
+})
+```
+
 #### 1. Download the whole set of coding DNA sequences for E. coli and your organism of interest. How many coding sequences are present in these organisms? Present this in the form of a table. Describe any differences between the two organisms. 
 Placeholder:
 * Describe how you solved the problem. 
 * Provide the answer or answers as directed. The answers could include numerical or categorical data, tables or charts.
 
-Load packages needed:
-```{r loading packages}
-suppressPackageStartupMessages({
-  library("seqinr") # is a package designed to process and analyse sequence data.
-  library("R.utils") # general utilities like zip and unzip
-  library("ggplot2") # for graphs
-})
-```
-
-Download both E. coli (GCA_000005845) and A. aceti (GCA_002005445) from Ensembl
+Download both E. coli (GCA_000005845) and A. aceti (GCA_002005445) from Ensembl Bacteria.
 ```{r}
 #E. coli
 URL="https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
@@ -166,7 +169,8 @@ download.file(URL,destfile="aaceti_cds.fa.gz")
 gunzip("aaceti_cds.fa.gz")
 list.files()
 ```
-Figure out the number of coding sequences (cds) and present in a table.
+Figure out the number of coding sequences (cds) and present this in a table called `cds_table`.
+As below, E. coli has around 837 more coding sequences than A. aceti (4239 - 3402 = 837)
 ```{r}
 ecoli_cds <- seqinr::read.fasta("ecoli_cds.fa")
 aaceti_cds <- seqinr::read.fasta("aaceti_cds.fa")
@@ -178,8 +182,6 @@ cds_table <- data.frame(
 
 cds_table
 ```
-E. coli has around 837 more coding sequences than A. aceti.
-
 
 #### 2. How much coding DNA is there in total for these two organisms? Present this in the form of a table. Describe any differences between the two organisms.
 
@@ -235,67 +237,76 @@ The fact that A. aceti has a higher mean but a lower median implies its coding s
 
 #### 4. Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence. Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.
 
-Frequency of DNA bases per organism. To count the entire genome we use `unlist`.
+##### Frequency of DNA bases per organism. 
+
+To count the entire genome we use `unlist`.
+
+From our results regarding the frequency of DNA bases:
+E. coli and A. aceti differ noticeably in base composition.
+* E. coli is more balanced between A/T (both ~24%) and G/C (~25–27%).
+* A. aceti is relatively GC-rich, with higher C (28%) and G (29.6%) but lower A (20%) and T (21.8%).
+* This indicates that A. aceti has a higher GC content compared to E. coli, which could potentially influence genome stability, codon usage and gene expression.
+
+
 ```{r}
 # Concatenate all CDS into one sequence per organism
 ecoli_seq <- unlist(ecoli_cds)
 aaceti_seq <- unlist(aaceti_cds)
 
-# Count combinations of 1s of the nucleotides in entire DNA
+# Count combinations of 1s of the nucleotides in entire DNA using seqinr::count
 ecoli_dna_composition <- count(ecoli_seq,1)
 aaceti_dna_composition <- count(aaceti_seq,1)
-# Relative frequencies
+
+# Relative frequencies can be calculated
 ecoli_nt_freq <- ecoli_dna_composition/sum(ecoli_dna_composition)
 aaceti_nt_freq <- aaceti_dna_composition/sum(aaceti_dna_composition)
 
 ecoli_nt_freq 
 aaceti_nt_freq
 
-#Barplots. `las=1` to make the labels horizontal only
-barplot(ecoli_dna_composition, 
-        xlab="Nucleotides", 
-        ylab="Frequency", 
-        main="E. coli CDS composition", 
-        las=1, 
-        col="skyblue")
-barplot(aaceti_dna_composition, 
-        xlab="Nucleotides", 
-        ylab="Frequency", 
-        main="A. aceti CDS composition", 
-        las=1, 
-        col="plum1")
+#Barplots to show nucleotide composition.
+# barplot(ecoli_dna_composition, 
+#         xlab="Nucleotides", 
+#         ylab="Frequency", 
+#         main="E. coli CDS composition", 
+#         las=1, 
+#         col="skyblue")
+# barplot(aaceti_dna_composition, 
+#         xlab="Nucleotides", 
+#         ylab="Frequency", 
+#         main="A. aceti CDS composition", 
+#         las=1, 
+#         col="plum1")
 
 #We can also plot our nucleotide frequencies
 barplot(ecoli_nt_freq , 
         xlab="Nucleotides", 
         ylab="Proportion", 
         main="E. coli CDS composition", 
-        las=1, 
+        las=1, # to make the labels horizontal only
         col="skyblue")
 grid()
 barplot(aaceti_nt_freq, 
         xlab="Nucleotides", 
         ylab="Proportion", 
         main="A. aceti CDS composition", 
-        las=1, 
+        las=1, # to make the labels horizontal only
         col="plum1")
 grid()
 ```
-E. coli and A. aceti differ noticeably in base composition.
-E. coli: more balanced between A/T (both ~24%) and G/C (~25–27%).
-A. aceti: relatively GC-rich, with higher C (28%) and G (29.6%) but lower A (20%) and T (21.8%).
-This indicates that A. aceti has a higher GC content compared to E. coli, which could influence genome stability, codon usage, and gene expression.
 
-
-## Translation shows the protein sequence of the genes
+##### Translation for the protein sequence of the genes
+In the code, `lapply` applies the translate function to each element of the cds list, resulting in prot, a list of translated protein sequences.
 ```{r}
 #unlist and use lapply to translate entire genome
 ecoli_prot <- unlist(lapply(ecoli_cds, translate))
 aaceti_prot <- unlist(lapply(aaceti_cds, translate))
 ```
 
+We can use the two prot lists to get any useful information, such as the number of unique amino acids.
+aa <- unique(prot[[2]]) extracts these amino acids, aa <- aa[aa != "*"] removes any asterisks for unknown amino acids, and length(aa) counts the remaining unique amino acids.
 
-We can use the prot list to get any useful information, such as the number of unique amino acids. aa <- unique(prot[[2]]) extracts these amino acids, aa <- aa[aa != "*"] removes any asterisks for unknown amino acids, and length(aa) counts the remaining unique amino acids.
+Here we store E. coli in `aa` and A. aceti in `aa1`. Both have 20 unique amino acids.
 ```{r}
 aa <- unique(ecoli_prot)
 aa <- aa[aa != "*"]
@@ -305,6 +316,7 @@ aa1 <- unique(aaceti_prot)
 aa1 <- aa1[aa1 != "*"]
 length(aa1)
 
+#count amino acids using seqinr::count
 count(ecoli_prot,wordsize=1,alphabet=aa)
 count(aaceti_prot,wordsize=1,alphabet=aa1)
 ```
@@ -356,7 +368,8 @@ grid()
 ```
 
 
-Checking only - do we want a table to compare?
+We can also generate a table to compare the two organisms' nucleotides and amino acid sequences side-by-side.
+Here `knitr` is used to generate a cleaner html table.
 ```{r}
 # DNA nucleotide frequency table
 nt_freq_table <- data.frame(
@@ -387,47 +400,48 @@ knitr::kable(aa_freq_table, digits=4,
 
 #### 5. Create a codon usage table and quantify the codon usage bias among all coding sequences. Describe any differences between the two organisms with respect to their codon usage bias. Provide charts to support your observations.
 
-A codon is a three base triplet that codes for a particular amino acid. As there are 64 possible codons and just 20 amino acids (and 3 termination codons), some amino acids are coded by multiple codons. For example, leucine is coded by six codons that are synonymous for it.
+A codon is a three base triplet that codes for a particular amino acid. As there are 64 possible codons and just 20 amino acids (and 3 termination codons); some amino acids are coded by multiple codons. For example, leucine is coded by six codons that are synonymous for it.
 
 `seqinr` has a command called `uco` which calculates some codon usage information.
 
-The RSCU stands for relative synonymous codon usage, which is a measure as to how preferred a codon of a particular amino acid is compared to the other codons which also encode it. A value of 1 indicating that the codon is used as expected. Values above 1 suggest that the codon is used more frequently than expected, while values below 1 indicate lower usage.
-RSCU ≈ 1 = codon used as expected.
-RSCU > 1 = codon is preferred.
-RSCU < 1 = codon is under-represented
+The RSCU stands for Relative Synonymous Codon Usage, which is a measure as to how preferred a codon of a particular amino acid is compared to the other codons which also encode it. A value of 1 indicating that the codon is used as expected. Values above 1 suggest that the codon is used more frequently than expected, while values below 1 indicate lower usage.
 
+* RSCU ≈ 1 means codon used as expected.
+* RSCU > 1 means codon is preferred.
+* RSCU < 1 means codon is under-represented.
 
+We create a codon usage table to quantify the codon usage bias for both E. coli and A. aceti. The first 6 rows are displayed.
 ```{r}
 # Codon usage tables
 # Concatenate all CDS into one long sequence and get codon frequencies
 ecoli_codon <- uco(unlist(ecoli_cds),index="rscu", as.data.frame = TRUE)
 aaceti_codon <- uco(unlist(aaceti_cds), index = "rscu", as.data.frame = TRUE)
 
-#View both tables
+#View top 6 rows of both tables
 head(ecoli_codon)
 head(aaceti_codon)
 ```
 
-We can also display bar plots to visualise codon usage
-`las=2` to keep it vertical
-The red dashed line at RSCU = 1 shows where codons would be equally used
+We can display bar plots to visualise codon usage for both organisms. 
+The `las=2` is to keep the labels vertical for ease of graph reading.
+The red dashed line at RSCU = 1 shows where codons would be equally used.
 ```{r}
 
 #store as non-dataframe for below graphs
 ecoli_rscu <- uco(unlist(ecoli_cds),index="rscu")
 aaceti_rscu <- uco(unlist(aaceti_cds), index = "rscu")
 
-barplot(ecoli_rscu, las=2, cex.names=0.6,
+barplot(ecoli_rscu, las=2, cex.names=0.5,
         main="E. coli RSCU", ylab="RSCU", col="skyblue")
 abline(h=1, col="red", lty=2)
 
-barplot(aaceti_rscu, las=2, cex.names=0.6,
+barplot(aaceti_rscu, las=2, cex.names=0.5,
         main="A. aceti RSCU", ylab="RSCU", col="plum1")
 abline(h=1, col="red", lty=2)
 ```
 
-However, it is better if we could look at the RSCU of both organisms side by side.
-We can combine `ecoli_codon` and `aaceti_codon` into one table with the amino acid and codon columns.
+However, it is better if we could look at the RSCU of both organisms side by side. Therefore, we can create a new combined table.
+We can combine `ecoli_codon` and `aaceti_codon` into one table with the amino acid and codon columns and call it `rscu_table`.
 ```{r}
 # Make sure RSCU columns have unique names
 colnames(ecoli_codon)[colnames(ecoli_codon) == "RSCU"] <- "RSCU_Ecoli"
@@ -441,27 +455,24 @@ rscu_table <- merge(ecoli_codon[, c("codon", "AA", "RSCU_Ecoli")],
 # Reorder columns
 rscu_table <- rscu_table[, c("codon", "AA", "RSCU_Ecoli", "RSCU_Aaceti")]
 
-# print table
+# print top 6 rows of table
 head(rscu_table)
-
 ```
 
 
-###Visualising codon usage bias
-
-
+We can then visualise via another combined bar plot of RSCU values for both organisms together with RSCU = 1 shown as a dashed red line.
 ```{r}
-# Create a matrix of RSCU values: rows = organisms, cols = codons
+# Create a matrix of RSCU values: rows = organisms, columns = codons
 rscu_matrix <- rbind(rscu_table$RSCU_Ecoli, rscu_table$RSCU_Aaceti)
 rownames(rscu_matrix) <- c("E. coli", "A. aceti")
 colnames(rscu_matrix) <- rscu_table$codon
 
-# Create barplot
+# Create barplot for comparing the two organisms
 barplot(rscu_matrix,
-        beside = TRUE,                    # side-by-side bars
+        beside = TRUE, # side-by-side bars
         col = c("skyblue", "plum1"),
-        las = 2,                          # rotate x-axis labels vertically
-        cex.names = 0.7,                  # smaller font for codon names
+        las = 2,  # rotate x-axis labels vertically
+        cex.names = 0.5, # smaller font for codon names
         ylim = c(0, max(rscu_matrix) * 1.2),
         main = "Codon Usage Bias (RSCU values)",
         ylab = "RSCU",
@@ -475,44 +486,139 @@ legend("topright", legend = rownames(rscu_matrix), fill = c("skyblue", "plum1"))
 # Add red dashed line at RSCU = 1
 abline(h = 1, col = "red", lty = 2, lwd = 2)
 ```
-Not sure if this is useful if difficult to label the AA (to delete?)
+
+
+
+
+
+However, if we could group the codons by the amino acids we can further visualise the most common ones with the codon bias for each. Call dplyr package here as it usually masks the count() from seqinr if used earlier. We detach it after the graph is created.
 ```{r}
-# 1. Order codons by Amino Acid
-rscu_table <- rscu_table[order(rscu_table$AA, rscu_table$codon), ]
+suppressPackageStartupMessages({
+library("dplyr") # For group_by() and mutate()
+})
+```
 
-# 2. Create matrix of RSCU values (rows = organisms, columns = codons)
-rscu_matrix <- rbind(rscu_table$RSCU_Ecoli, rscu_table$RSCU_Aaceti)
-rownames(rscu_matrix) <- c("E. coli", "A. aceti")
-colnames(rscu_matrix) <- rscu_table$codon
+This stacked bar plot uses `ggplot2`, `dplyr`, `patchwork` and `forcats` (all called earlier in this R Markdown).
+Note that we have 21 amino acids as **Stp** is the extra amino acid (stop codon) coded by TAA, TAG and TGA.
+```{r}
+# Prepare data for plot
+dat_aaceti <- data.frame(Codon=c(rscu_table$codon),RSCU=c(rscu_table$RSCU_Aaceti),AA=c(rscu_table$AA))
+dat_ecoli <- data.frame(Codon=c(rscu_table$codon),RSCU=c(rscu_table$RSCU_Ecoli),AA=c(rscu_table$AA))
 
-# 3. Create color separators for amino acids
-aa_changes <- which(rscu_table$AA[-1] != rscu_table$AA[-nrow(rscu_table)])  # positions where AA changes
-aa_positions <- aa_changes + 0.5  # place separators between codons
+# Create a column for fill colour of each codon
+dat_aaceti$Col=1
+dat_ecoli$Col=1
 
-# 4. Base R barplot
-bp <- barplot(rscu_matrix,
-              beside = TRUE,
-              col = c("skyblue", "plum1"),
-              names.arg = colnames(rscu_matrix),
-              las = 2,
-              cex.names = 0.7,
-              ylim = c(0, max(rscu_matrix) * 1.2),
-              main = "Codon Usage Bias (RSCU values) by Amino Acid",
-              ylab = "RSCU",
-              xlab = "Codon")
+# This populates the Col column with unique values for each codon coding an amino. Each value is a colour, therefore all amino acids will share the same values but the codons will be different.
+dat_aaceti=dat_aaceti %>% group_by(AA) %>% mutate(Col = lag(cumsum(Col), default = 0)) %>% mutate(Col =as.factor(Col))
+dat_ecoli=dat_ecoli %>% group_by(AA) %>% mutate(Col = lag(cumsum(Col), default = 0)) %>% mutate(Col =as.factor(Col))
 
-# 5. Add legend
-legend("topright", legend = rownames(rscu_matrix), fill = c("skyblue", "plum1"))
+# Create bar plots - A. aceti
+p0 = ggplot(data=dat_aaceti, aes(x=AA, y=RSCU, fill=Col)) +
+  geom_bar(stat='identity') +
+  theme_minimal() +
+  theme(axis.title.x = element_blank()) +
+  guides(fill = "none") +
+  ggtitle("Codon Usage Bias in A. aceti") +
+  theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))
 
-# 6. Add red dashed line at RSCU = 1
-abline(h = 1, col = "red", lty = 2, lwd = 2)
+# Create tile plot - A. aceti
+p1 = ggplot(data=dat_aaceti) +
+  geom_tile(aes(x=AA, y=fct_rev(Col), fill=Col), col="white") +
+  geom_text(aes(x=AA, y=Col, label=Codon), col="white", size=3.5) +
+  theme_void() +
+  theme(legend.position="none") +
+  guides(fill = "none")
 
-# 7. Add vertical lines to separate amino acids
-abline(v = bp[1, aa_positions], col = "grey50", lty = 3)
+# Create bar plots - E. coli
+p2 = ggplot(data=dat_ecoli, aes(x=AA, y=RSCU, fill=Col)) +
+  geom_bar(stat='identity') +
+  theme_minimal() +
+  theme(axis.title.x = element_blank()) +
+  guides(fill = "none") +
+  ggtitle("Codon Usage Bias in E. coli") +
+  theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))
+
+# Create tile plot - E. coli
+p3 = ggplot(data=dat_ecoli) +
+  geom_tile(aes(x=AA, y=fct_rev(Col), fill=Col), col="white") +
+  geom_text(aes(x=AA, y=Col, label=Codon), col="white", size=3.5) +
+  theme_void() +
+  theme(legend.position="none") +
+  guides(fill = "none")
+
+#Combine plots in a single plot for each organism
+plot_aaceti=p0/p1
+plot_ecoli=p2/p3
+
+#Set plot size. The ratio here is 7:1 - i.e. the bar plot is 7 times the height of the tile plot
+plot_aaceti=plot_aaceti+plot_layout(heights = c(7, 1))
+plot_ecoli=plot_ecoli+plot_layout(heights = c(7, 1))
+
+#print plots
+plot_ecoli
+plot_aaceti
+```
+
+We detach `dplyr` as it masks the seqinr::count needed later
+```{r}
+#detach dplyr as it could mask seqinr::count needed later
+detach("package:dplyr", unload=TRUE)
 ```
 
 
-Are we allowed to use a heatmap for codon bias using ggplot2?
+We can further separate each amino acid into distinct plots. The "Stp" amino acid is removed for clarity.
+```{r}
+## Store data into a new data frame structure
+aaceti_dat <- data.frame(
+  Codon = rscu_table$codon,
+  RSCU  = rscu_table$RSCU_Aaceti,
+  AA    = rscu_table$AA,
+  stringsAsFactors = FALSE
+)
+
+# Remove stop codons
+aaceti_dat <- aaceti_dat[aaceti_dat$AA != "Stp", ]
+
+# Order by AA then Codon
+aaceti_dat <- aaceti_dat[order(aaceti_dat$AA, aaceti_dat$Codon), ]
+aa_levels <- unique(aaceti_dat$AA)
+
+# Set plotting area: adjust nrow/ncol depending on number of amino acids
+nAA <- length(aa_levels)
+ncol <- 5   # choose grid layout
+nrow <- ceiling(nAA / ncol)
+
+par(mfrow=c(nrow, ncol))
+par(mar=c(3,3,2,1), oma=c(3,1,3,1), cex.axis=0.8, cex.lab=0.8, cex.main=0.9)
+
+# Loop through each AA and plot codon usage
+for (current_aa in aa_levels) {
+  subset_aaceti_dat <- aaceti_dat[aaceti_dat$AA == current_aa, ]
+  
+  bp <- barplot(
+    subset_aaceti_dat$RSCU,
+    names.arg = subset_aaceti_dat$Codon,
+    ylim = c(0, max(aaceti_dat$RSCU) + 0.5),
+    col = "plum1",
+    las = 2,
+    cex.names = 0.8,
+    ylab = "RSCU",
+    main = current_aa
+  )
+  
+  # Reference line at RSCU = 1
+  abline(h=1, col="red", lty=2)
+}
+
+# Add a main title for the entire figure
+mtext("Codon Usage Bias Across Amino Acids (A. aceti)", outer = TRUE, cex = 0.9, font = 2)
+```
+
+To further assist with visualisation of codon usage bias in both organisms, the below creates a heatmap for codon bias using `ggplot2`.
+Here the codons are aligned on the x-axis, with the organisms in the y-axis. We can compare the RSCU visually this way.
+We can see that:
+* ctg is most overrepresented in both organisms
 ```{r}
 # Convert to data frames to prepare for heat map (different to the rscu_table)
 df_ecoli <- data.frame(
@@ -545,12 +651,12 @@ ggplot(rscu_all, aes(x = Codon, y = Organism, fill = RSCU)) +
 
 #### 6. In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in your organism of interest. Are these k-mers also over- and under-represented in E. coli to a similar extent? Provide plots to support your observations. Why do you think these sequences are present at different levels in the genomes of these organisms?
 
-Before we already translated the CDS to protein sequences...
-K-mer is simply a short sequence string of length k. We can use k-mer analysis to identify particular sequences that are over- or under-represented in an organism.
-```{r}
-#we counted unique aa in ecoli earlier and stored as aa (E. coli) and aa1 (A. aceti)
+Before, we already translated the CDS to protein sequences. K-mer is simply a short sequence string of length k. We can use k-mer analysis to identify particular protein sequences that are over- or under-represented in an organism.
 
-# Example for 3 k-mers
+##### 3-kmers
+We counted unique amino acids in ecoli earlier and stored as `aa` (E. coli) and `aa1` (A. aceti).
+```{r}
+# For 3 k-mers
 ecoli_kmer <- unlist(ecoli_prot)
 aaceti_kmer <- unlist(aaceti_prot)
 
@@ -564,19 +670,21 @@ head(aaceti_k3)
 #Convert counts to frequency so the different proteome sizes don't bias the comparison
 ecoli_k3_freq <- count(ecoli_kmer,wordsize=3,alphabet=aa,freq=TRUE)
 head(ecoli_k3_freq)
+
 aaceti_k3_freq <- count(aaceti_kmer,wordsize=3,alphabet=aa1,freq=TRUE)
 head(aaceti_k3_freq)
-
 ```
+Place 3-kmer frequencies into a table together.
 ```{r}
 k3_table <- data.frame(
     Ecoli = ecoli_k3_freq,
   Aaceti = aaceti_k3_freq
 )
 
+#view top 6
 head(k3_table)
 ```
-Finding the top 10 over and under represented k-mers in A. aceti for length 3
+Finding the top 10 over and under represented k-mers in A. aceti for length 3 -
 This just plots the bar graph with both top and bottom -Can separate this if it looks better?
 
 Still yet to: "Are these k-mers also over- and under-represented in E. coli to a similar extent?"
