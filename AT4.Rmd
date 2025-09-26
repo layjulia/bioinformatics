@@ -456,44 +456,16 @@ rscu_table <- merge(ecoli_codon[, c("codon", "AA", "RSCU_Ecoli")],
 # Reorder columns
 rscu_table <- rscu_table[, c("codon", "AA", "RSCU_Ecoli", "RSCU_Aaceti")]
 
-# print top 6 rows of table
+# print table
 head(rscu_table)
 ```
-
-
-We can then visualise via another combined bar plot of RSCU values for both organisms together with RSCU = 1 shown as a dashed red line. We can already see that the codon with the largest RSCU value is the _ctg_ codon for both organisms.
-```{r}
-# Create a matrix of RSCU values: rows = organisms, columns = codons
-rscu_matrix <- rbind(rscu_table$RSCU_Ecoli, rscu_table$RSCU_Aaceti)
-rownames(rscu_matrix) <- c("E. coli", "A. aceti")
-colnames(rscu_matrix) <- rscu_table$codon
-
-# Create barplot for comparing the two organisms
-barplot(rscu_matrix,
-        beside = TRUE, # side-by-side bars
-        col = c("skyblue", "plum1"),
-        las = 2,  # rotate x-axis labels vertically
-        cex.names = 0.5, # smaller font for codon names
-        ylim = c(0, max(rscu_matrix) * 1.2),
-        main = "Codon Usage Bias (RSCU values)",
-        ylab = "RSCU",
-        xlab = "Codon",
-        names.arg = colnames(rscu_matrix) # explicit x-axis labels
-)
-
-# Add legend
-legend("topright", legend = rownames(rscu_matrix), fill = c("skyblue", "plum1"))
-
-# Add red dashed line at RSCU = 1
-abline(h = 1, col = "red", lty = 2, lwd = 2)
-```
-
 
 However, if we could group the codons by the amino acids we can further visualise the most common ones with the codon bias for each. The stacked bar graph is clearer in showing the contribution of the codons to a specific amino acid.
 
 This stacked bar plot uses `ggplot2`, `dplyr`, `patchwork` and `forcats` (all called earlier in this R Markdown).
 Note that we have 21 amino acids as **Stp** is the extra amino acid (stop codon) coded by TAA, TAG and TGA.
-Bar color corresponds to the codon for each amino acid
+
+The below are relative synonymous codon usage (RSCU) charts for E. coli and A. aceti where all codons coding for each amino acid are represented in the boxes below the bar chart.
 ```{r}
 # Prepare data for plot
 dat_aaceti <- data.frame(Codon=c(rscu_table$codon),RSCU=c(rscu_table$RSCU_Aaceti),AA=c(rscu_table$AA))
@@ -643,53 +615,181 @@ Before, we already translated the CDS to protein sequences. K-mer is simply a sh
 ##### 3-kmers
 We counted unique amino acids in ecoli earlier and stored as `aa` (E. coli) and `aa1` (A. aceti).
 ```{r}
-# For 3 k-mers
+#Prepare file
 ecoli_kmer <- unlist(ecoli_prot)
 aaceti_kmer <- unlist(aaceti_prot)
 
+#For 3 kmers
 ecoli_k3 <- seqinr::count(ecoli_kmer,wordsize=3,alphabet=aa)
 aaceti_k3 <- seqinr::count(aaceti_kmer,wordsize=3,alphabet=aa1)
+#4 k mers
+ecoli_k4 <- seqinr::count(ecoli_kmer,wordsize=4,alphabet=aa)
+aaceti_k4 <- seqinr::count(aaceti_kmer,wordsize=4,alphabet=aa1)
+#5 kmers
+ecoli_k5 <- seqinr::count(ecoli_kmer,wordsize=5,alphabet=aa)
+aaceti_k5 <- seqinr::count(aaceti_kmer,wordsize=5,alphabet=aa1)
 
-#check
+#check all
 head(ecoli_k3)
 head(aaceti_k3)
+
+head(ecoli_k4)
+head(aaceti_k4)
+
+head(ecoli_k5)
+head(aaceti_k5)
 
 #Convert counts to frequency so the different proteome sizes don't bias the comparison
 ecoli_k3_freq <- seqinr::count(ecoli_kmer,wordsize=3,alphabet=aa,freq=TRUE)
 head(ecoli_k3_freq)
-
 aaceti_k3_freq <- seqinr::count(aaceti_kmer,wordsize=3,alphabet=aa1,freq=TRUE)
 head(aaceti_k3_freq)
+
+ecoli_k4_freq <- seqinr::count(ecoli_kmer,wordsize=4,alphabet=aa,freq=TRUE)
+head(ecoli_k4_freq)
+aaceti_k4_freq <- seqinr::count(aaceti_kmer,wordsize=4,alphabet=aa1,freq=TRUE)
+head(aaceti_k4_freq)
+
+ecoli_k5_freq <- seqinr::count(ecoli_kmer,wordsize=5,alphabet=aa,freq=TRUE)
+head(ecoli_k5_freq)
+aaceti_k5_freq <- seqinr::count(aaceti_kmer,wordsize=5,alphabet=aa1,freq=TRUE)
+head(aaceti_k5_freq)
 ```
-Place 3-kmer frequencies into a table together.
+Place frequencies into a table together.
 ```{r}
 k3_table <- data.frame(
     Ecoli = ecoli_k3_freq,
   Aaceti = aaceti_k3_freq
 )
 
+k4_table <- data.frame(
+    Ecoli = ecoli_k4_freq,
+  Aaceti = aaceti_k4_freq
+)
+
+k5_table <- data.frame(
+    Ecoli = ecoli_k5_freq,
+  Aaceti = aaceti_k5_freq
+)
+
 #view top 6
 head(k3_table)
+head(k4_table)
+head(k5_table)
 ```
-Finding the top 10 over and under represented k-mers in A. aceti for length 3 -
-This just plots the bar graph with both top and bottom -Can separate this if it looks better?
+Finding the top 10 over and under represented k-mers in A. aceti for length 3-5.
+
+This plots the bar graph with both top and bottom.
 
 Still yet to: "Are these k-mers also over- and under-represented in E. coli to a similar extent?"
 We could pull out the same kmers as the k3_table would have e. coli 
+
+This selects the 10 highest and 10 lowest frequency kmers in A. aceti.
 ```{r}
 over_k3_aaceti <- head(k3_table[order(-k3_table$Aaceti.Freq), ], 10)
 under_k3_aaceti <- head(k3_table[order(k3_table$Aaceti.Freq), ], 10)
-
 aaceti_top_k3 <- rbind(over_k3_aaceti, under_k3_aaceti)
 
-barplot(height = aaceti_top_k3$Aaceti.Freq,
-        names.arg = aaceti_top_k3$Aaceti.Var1,
-        col = "plum1",
-        las = 2,
-        ylab = "Frequency in A. aceti",
-        xlab = "3-kmers",
-        main = "Most over- and under-represented 3-kmers in A. aceti",
-        cex.names = 0.8)
-abline(h=0, lty=2, col="grey40")
+over_k4_aaceti <- head(k4_table[order(-k4_table$Aaceti.Freq), ], 10)
+under_k4_aaceti <- head(k4_table[order(k4_table$Aaceti.Freq), ], 10)
+aaceti_top_k4 <- rbind(over_k4_aaceti, under_k4_aaceti)
+
+over_k5_aaceti <- head(k5_table[order(-k5_table$Aaceti.Freq), ], 10)
+under_k5_aaceti <- head(k5_table[order(k5_table$Aaceti.Freq), ], 10)
+aaceti_top_k5 <- rbind(over_k5_aaceti, under_k5_aaceti)
 ```
 
+For the top 10 highest and 10 lowest frequency kmers in A. aceti, we compare the frequencies with E. coli - i.e. for the same k-mers
+```{r}
+# Add side-by-side bars
+barplot(
+  t(as.matrix(aaceti_top_k3[, c("Aaceti.Freq","Ecoli.Freq")])),
+  beside = TRUE,
+  names.arg = aaceti_top_k3$Aaceti.Var1,
+  col = c("plum1", "skyblue"),
+  las = 2,
+  ylab = "Frequency",
+  xlab = "3-kmers",
+  main = "Comparison of 3-kmers: A. aceti vs E. coli"
+)
+legend("topright", legend=c("A. aceti","E. coli"), fill=c("plum1","skyblue"))
+
+#4-mers
+barplot(
+  t(as.matrix(aaceti_top_k4[, c("Aaceti.Freq","Ecoli.Freq")])),
+  beside = TRUE,
+  names.arg = aaceti_top_k4$Aaceti.Var1,
+  col = c("plum1", "skyblue"),
+  las = 2,
+  ylab = "Frequency",
+  xlab = "4-kmers",
+  main = "Comparison of 4-kmers: A. aceti vs E. coli"
+)
+legend("topright", legend=c("A. aceti","E. coli"), fill=c("plum1","skyblue"))
+
+#5-mers plot
+barplot(
+  t(as.matrix(aaceti_top_k5[, c("Aaceti.Freq","Ecoli.Freq")])),
+  beside = TRUE,
+  names.arg = aaceti_top_k5$Aaceti.Var1,
+  col = c("plum1", "skyblue"),
+  las = 2,
+  ylab = "Frequency",
+  xlab = "5-kmers",
+  main = "Comparison of 5-kmers: A. aceti vs E. coli"
+)
+legend("topright", legend=c("A. aceti","E. coli"), fill=c("plum1","skyblue"))
+```
+
+Using a function to summarise the above more efficiently
+```{r}
+# Function to get top over/under-represented k-mers and plot:
+plot_kmer_comparison <- function(prot1, prot2, aa1, aa2, k = 3, top_n = 10,
+                                 org1_name="A. aceti", org2_name="E. coli") {
+  
+  # Count k-mers (frequency)
+  kmers1_freq <- seqinr::count(prot1, wordsize = k, alphabet = aa1, freq = TRUE)
+  kmers2_freq <- seqinr::count(prot2, wordsize = k, alphabet = aa2, freq = TRUE)
+  
+  # Convert to data frame
+  kmer_table <- data.frame(
+    Kmer = names(kmers1_freq),
+    Org1.Freq = as.numeric(kmers1_freq),
+    Org2.Freq = as.numeric(kmers2_freq),
+    stringsAsFactors = FALSE
+  )
+  
+  # Select top and bottom k-mers in organism 1
+  over_kmers  <- head(kmer_table[order(-kmer_table$Org1.Freq), ], top_n)
+  under_kmers <- head(kmer_table[order(kmer_table$Org1.Freq), ], top_n)
+  
+  # Combine
+  top_kmers <- rbind(over_kmers, under_kmers)
+  
+  # Create matrix for barplot
+  freq_matrix <- t(as.matrix(top_kmers[, c("Org1.Freq", "Org2.Freq")]))
+  colnames(freq_matrix) <- top_kmers$Kmer
+  
+  # Plot side-by-side comparison
+  barplot(
+    freq_matrix,
+    beside = TRUE,
+    col = c("plum1", "skyblue"),
+    las = 2,
+    ylab = "Frequency",
+    xlab = paste(k, "-mers", sep=""),
+    main = paste("Over/Under-represented", k, "-mers in", org1_name, "vs", org2_name),
+    cex.names = 0.8
+  )
+  
+  legend("topright", legend = c(org1_name, org2_name), fill = c("plum1", "skyblue"))
+  abline(h=0, col="grey40", lty=2)
+}
+
+
+
+plot_kmer_comparison(aaceti_prot, ecoli_prot, aa1, aa, k=3)
+plot_kmer_comparison(aaceti_prot, ecoli_prot, aa1, aa, k=4)
+plot_kmer_comparison(aaceti_prot, ecoli_prot, aa1, aa, k=5)
+
+```
