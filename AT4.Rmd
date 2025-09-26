@@ -140,12 +140,13 @@ As part of your assignment, you will study one of the following organisms and co
 Organism allocated: Acetobacter aceti (GCA_002005445)
 
 ##### Load all packages needed for Part 2:
+Note that the `count()` function must be distinguished as it is in both `seqinr` and `dplyr`
 ```{r loading packages}
 suppressPackageStartupMessages({
   library("seqinr") # is a package designed to process and analyse sequence data.
   library("R.utils") # general utilities like zip and unzip
   library("ggplot2") # for plotting graphs
-  #library("dplyr") # For group_by() and mutate() - call this later as it disrupts seqinr::count
+  library("dplyr") # For group_by() and mutate() 
   library("patchwork") # to arrange plots
   library("forcats") # for fct_rev()
 })
@@ -254,8 +255,8 @@ ecoli_seq <- unlist(ecoli_cds)
 aaceti_seq <- unlist(aaceti_cds)
 
 # Count combinations of 1s of the nucleotides in entire DNA using seqinr::count
-ecoli_dna_composition <- count(ecoli_seq,1)
-aaceti_dna_composition <- count(aaceti_seq,1)
+ecoli_dna_composition <- seqinr::count(ecoli_seq,1)
+aaceti_dna_composition <- seqinr::count(aaceti_seq,1)
 
 # Relative frequencies can be calculated
 ecoli_nt_freq <- ecoli_dna_composition/sum(ecoli_dna_composition)
@@ -317,8 +318,8 @@ aa1 <- aa1[aa1 != "*"]
 length(aa1)
 
 #count amino acids using seqinr::count
-count(ecoli_prot,wordsize=1,alphabet=aa)
-count(aaceti_prot,wordsize=1,alphabet=aa1)
+seqinr::count(ecoli_prot,wordsize=1,alphabet=aa)
+seqinr::count(aaceti_prot,wordsize=1,alphabet=aa1)
 ```
 
 
@@ -460,7 +461,7 @@ head(rscu_table)
 ```
 
 
-We can then visualise via another combined bar plot of RSCU values for both organisms together with RSCU = 1 shown as a dashed red line.
+We can then visualise via another combined bar plot of RSCU values for both organisms together with RSCU = 1 shown as a dashed red line. We can already see that the codon with the largest RSCU value is the _ctg_ codon for both organisms.
 ```{r}
 # Create a matrix of RSCU values: rows = organisms, columns = codons
 rscu_matrix <- rbind(rscu_table$RSCU_Ecoli, rscu_table$RSCU_Aaceti)
@@ -488,18 +489,11 @@ abline(h = 1, col = "red", lty = 2, lwd = 2)
 ```
 
 
-
-
-
-However, if we could group the codons by the amino acids we can further visualise the most common ones with the codon bias for each. Call dplyr package here as it usually masks the count() from seqinr if used earlier. We detach it after the graph is created.
-```{r}
-suppressPackageStartupMessages({
-library("dplyr") # For group_by() and mutate()
-})
-```
+However, if we could group the codons by the amino acids we can further visualise the most common ones with the codon bias for each. The stacked bar graph is clearer in showing the contribution of the codons to a specific amino acid.
 
 This stacked bar plot uses `ggplot2`, `dplyr`, `patchwork` and `forcats` (all called earlier in this R Markdown).
 Note that we have 21 amino acids as **Stp** is the extra amino acid (stop codon) coded by TAA, TAG and TGA.
+Bar color corresponds to the codon for each amino acid
 ```{r}
 # Prepare data for plot
 dat_aaceti <- data.frame(Codon=c(rscu_table$codon),RSCU=c(rscu_table$RSCU_Aaceti),AA=c(rscu_table$AA))
@@ -559,13 +553,6 @@ plot_ecoli=plot_ecoli+plot_layout(heights = c(7, 1))
 plot_ecoli
 plot_aaceti
 ```
-
-We detach `dplyr` as it masks the seqinr::count needed later
-```{r}
-#detach dplyr as it could mask seqinr::count needed later
-detach("package:dplyr", unload=TRUE)
-```
-
 
 We can further separate each amino acid into distinct plots. The "Stp" amino acid is removed for clarity.
 ```{r}
@@ -660,18 +647,18 @@ We counted unique amino acids in ecoli earlier and stored as `aa` (E. coli) and 
 ecoli_kmer <- unlist(ecoli_prot)
 aaceti_kmer <- unlist(aaceti_prot)
 
-ecoli_k3 <- count(ecoli_kmer,wordsize=3,alphabet=aa)
-aaceti_k3 <- count(aaceti_kmer,wordsize=3,alphabet=aa1)
+ecoli_k3 <- seqinr::count(ecoli_kmer,wordsize=3,alphabet=aa)
+aaceti_k3 <- seqinr::count(aaceti_kmer,wordsize=3,alphabet=aa1)
 
 #check
 head(ecoli_k3)
 head(aaceti_k3)
 
 #Convert counts to frequency so the different proteome sizes don't bias the comparison
-ecoli_k3_freq <- count(ecoli_kmer,wordsize=3,alphabet=aa,freq=TRUE)
+ecoli_k3_freq <- seqinr::count(ecoli_kmer,wordsize=3,alphabet=aa,freq=TRUE)
 head(ecoli_k3_freq)
 
-aaceti_k3_freq <- count(aaceti_kmer,wordsize=3,alphabet=aa1,freq=TRUE)
+aaceti_k3_freq <- seqinr::count(aaceti_kmer,wordsize=3,alphabet=aa1,freq=TRUE)
 head(aaceti_k3_freq)
 ```
 Place 3-kmer frequencies into a table together.
