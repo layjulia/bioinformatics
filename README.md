@@ -13,37 +13,14 @@ This repository contains R scripts and analyses exploring **gene expression, gro
 - [Part 2: Examining biological sequence diversity](https://github.com/layjulia/bioinformatics?tab=readme-ov-file#part-2-examining-biological-sequence-diversity)
 
 ### Part 1: Gene expression analysis and growth data analysis
+Part 1 explores gene expression and long-term tree growth data. The table below summarises the inputs, analyses and outputs.
 
-Part 1 input files were downloaded from: https://github.com/ghazkha/Assessment4
+Part 1 input files from: https://github.com/ghazkha/Assessment4
 
-#### Gene Expression Analysis
-
-- **Input**: RNA-seq count data (`gene_expression.tsv`), containing raw counts for three samples.
-- **Scripts include**:
-  - Importing data and setting gene identifiers as row names.
-  - Calculating mean expression across samples.
-  - Listing top 10 highly expressed genes.
-  - Counting genes with mean expression < 10.
-  - Generating a histogram of mean expression values.  
-- **Output**:
-  - Summary tables (`head()` of genes, mean values).
-  - Ranked list of top 10 genes.
-  - Histogram plot of mean expression.
-  
-#### Growth Data Analysis
-
-- **Input**: Tree circumference measurements at two sites (control vs treatment) over 20 years (`growth_data.csv`)  
-- **Scripts include**:
-  - Importing CSV data into an R object.
-  - Summarising column names and dataset structure.
-  - Calculating mean and standard deviation of circumference at start and end.
-  - Boxplots of tree circumference distributions by site and timepoint.
-  - Mean growth over the last 10 years at each site.
-  - Hypothesis testing (`t.test`) for differences in growth.  
-- **Output**:
-  - Summary statistics (mean ± SD).
-  - Boxplot of growth trends.
-  - p-value for site comparison.
+| Analysis | Input | Key Steps | Outputs |
+|----------|-------|-----------|---------|
+| **Gene Expression Analysis** | `gene_expression.tsv` – RNA-seq counts (3 samples) | - Import data<br>- Compute mean expression per gene<br>- Identify top 10 highly expressed genes<br>- Count genes with mean < 10<br>- Generate histogram of mean gene expression | Summary tables, top 10 gene list, histogram plot |
+| **Growth Data Analysis** | `growth_data.csv` – Tree circumference (2 sites, 20 years) | - Import and explore dataset<br>- Calculate mean & SD at start/end of study<br>- Visualise distributions with boxplots by site/time<br>- Compute mean growth over last 10 years<br>- Perform `t.test` for site differences | Summary statistics (mean ± SD), box plots of growth trends, p-values |
 
 ### Part 2: Examining biological sequence diversity
 
