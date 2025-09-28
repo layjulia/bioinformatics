@@ -68,7 +68,7 @@ _A. aceti_ (GCA_002005445) is the allocated organism of interest and is compared
 1. Clone the repository: `git clone https://github.com/layjulia/bioinformatics.git`
 2. Open `AT4.Rmd` in RStudio.
 3. Install required packages: `install.packages(c("seqinr","R.utils","ggplot2","dplyr","patchwork","forcats","knitr"))`
-4. Knit the R Markdown to HTML to reproduce the analyses
+4. Knit the R Markdown to HTML to reproduce the analyses.
 
 ## Citations
 
