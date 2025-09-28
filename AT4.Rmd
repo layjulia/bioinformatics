@@ -571,13 +571,12 @@ ggplot(rscu_all, aes(x = Codon, y = Organism, fill = RSCU)) +
 
 ```
 
-**Graph: Codon Usage Bias Stacked Bar Chart**: 
-If we group the codons by the amino acids we can further visualise the most common ones with the codon bias for each. The stacked bar graph is clearer in showing the contribution of the codons to a specific amino acid.
+**Codon Usage Bias: Stacked Bar and Tile Charts**: 
+To better understand codon usage patterns, we grouped codons by their corresponding amino acids and calculated their relative synonymous codon usage (RSCU). The stacked bar charts highlight how frequently each codon is used for a given amino acid, making codon bias across amino acids clearer.
 
-This stacked bar plot uses `ggplot2`, `dplyr`, `patchwork` and `forcats` (all called earlier in this R Markdown).
-Note that we have 21 amino acids as **Stp** is the extra amino acid (stop codon) coded by TAA, TAG and TGA.
+In addition, tile plots below each bar chart show all codons that encode the same amino acid. This provides a direct mapping between codons and their relative contributions within each amino acid group.
 
-The below are relative synonymous codon usage (RSCU) charts for E. coli and A. aceti where all codons coding for each amino acid are represented in the boxes below the bar chart.
+Note: The charts display 21 amino acids, where **Stp** represents the stop codons (TAA, TAG and TGA).
 ```{r}
 # Extract Codon, RSCU values and Amino Acid (AA) from rscu_table
 dat_aaceti <- data.frame(
@@ -592,7 +591,8 @@ dat_ecoli <- data.frame(
   AA    = rscu_table$AA
 )
 
-# Create a column for fill colour of each codon
+# For each AA, assign codons sequential group IDs.
+# This ensures all codons for the same amino acid get related colour categories (used consistently across plots)
 dat_aaceti$Col <- 1
 dat_ecoli$Col <- 1
 
@@ -655,10 +655,12 @@ plot_ecoli    # RSCU codon usage plot for E. coli
 ```
 
 
-**Graph: Codon Usage Bias Bar Plots per Amino Acid (RSCU Values)**: 
-We can further separate each amino acid into distinct plots. The "Stp" amino acid is removed for clarity in this plot.
+**Codon Usage Bias: Bar Plots per Amino Acid (RSCU Values)**: 
+We can also create individual bar plots for each amino acid. Each bar shows the RSCU for the codons encoding that amino acid, allowing us to see which codons are preferred.
 
-A. aceti plot:
+These plots complement the earlier stacked and tile charts by breaking down each amino acid into separate visualisations, making it easier to compare codon bias across amino acids.
+
+For clarity, stop codons (**Stp**) are excluded from these plots so that only the 20 standard amino acids are shown.
 ```{r}
 ## Store data into a new data frame structure
 aaceti_dat <- data.frame(
@@ -706,7 +708,6 @@ for (current_aa in aa_levels) {
 mtext("Codon Usage Bias Across Amino Acids (A. aceti)", outer = TRUE, cex = 0.9, font = 2)
 ```
 
-E. coli plot:
 ```{r}
 ## Store data into a new data frame structure
 ecoli_dat <- data.frame(
@@ -757,7 +758,7 @@ mtext("Codon Usage Bias Across Amino Acids (E. coli)", outer = TRUE, cex = 0.9, 
 ##### Describe any differences between the two organisms with respect to their codon usage bias. 
 Both organisms exhibit codon usage bias, with some codons for the same amino acid used more frequently in one organism than the other
 
-* The CTG codon (codes for Leu) is most overrepresented in both organisms as shown in the heatmap and the codon usage stacked bargraph
+* The CTG codon (codes for Leu) is most overrepresented in both organisms as shown in the heatmap, the codon usage stacked bargraph and amino acid barplots.
 * Analysis of RSCU values shows that E. coli exhibits strong codon usage bias, favoring specific codons for several amino acids (e.g., AAA for Lys, CCG for Pro, CTG for Leu) while underusing others.
 * A. aceti displays a more balanced codon usage, for example, AAG is slightly preferred over AAA for Lys, CCC over CCG for Pro, and TGA is the dominant stop codon instead of TAA.
 * Other amino acids, such as Gly and Ala, show similar patterns in both organisms.
@@ -767,6 +768,7 @@ Both organisms exhibit codon usage bias, with some codons for the same amino aci
 #### 6. In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in your organism of interest. Are these k-mers also over- and under-represented in E. coli to a similar extent? Provide plots to support your observations. Why do you think these sequences are present at different levels in the genomes of these organisms?
 
 Calculate the frequency of amino acid k-mers (short subsequences of length k) in the translated proteomes of E. coli and A. aceti. By counting k-mers of length 3, 4, and 5, and then converting counts to relative frequencies, we can compare patterns of over- and under-representation between organisms while controlling for differences in overall proteome size.
+
 ```{r}
 # unlist protein sequence
 ecoli_kmer <- unlist(ecoli_prot)
@@ -867,21 +869,21 @@ k5_summary <- rbind(
 knitr::kable(
   k3_summary[, c("Type", "Aaceti.Var1", "Aaceti.Freq", "Ecoli.Freq", "Aaceti.rank", "Ecoli.rank")], 
   caption = "Top 10 highest and lowest frequency 3-mers in A. aceti",
-  digits = 4
+  digits = 6 # decimal places
 )
 
 # table for k=4
 knitr::kable(
   k4_summary[, c("Type", "Aaceti.Var1", "Aaceti.Freq", "Ecoli.Freq", "Aaceti.rank", "Ecoli.rank")], 
   caption = "Top 10 highest and lowest frequency 4-mers in A. aceti",
-  digits = 4
+  digits = 6 # decimal places
 )
 
 # table for k=5
 knitr::kable(
   k5_summary[, c("Type", "Aaceti.Var1", "Aaceti.Freq", "Ecoli.Freq", "Aaceti.rank", "Ecoli.rank")], 
   caption = "Top 10 highest and lowest frequency 5-mers in A. aceti",
-  digits = 4
+  digits = 6 # decimal places
 )
 ```
 

@@ -15,8 +15,6 @@ This repository contains R scripts and analyses exploring **gene expression, gro
 ### Part 1: Gene expression analysis and growth data analysis
 Part 1 explores gene expression and long-term tree growth data. The table below summarises the inputs, analyses and outputs.
 
-Part 1 input files from: https://github.com/ghazkha/Assessment4
-
 | Analysis | Key Steps | Outputs |
 |----------|-----------|---------|
 | **Gene Expression Analysis** <br> (`gene_expression.tsv` – RNA-seq counts) | - Import data<br>- Compute mean expression per gene<br>- Identify top 10 highly expressed genes<br>- Count genes with mean < 10<br>- Generate histogram of mean gene expression | Summary tables, top 10 gene list, histogram plot |
