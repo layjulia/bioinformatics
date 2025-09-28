@@ -52,13 +52,16 @@ _A. aceti_ (GCA_002005445) is the allocated organism of interest and is compared
 
 - **R**
 - R packages required:
-  - `seqinr`
-  - `R.utils`
-  - `ggplot2`
-  - `dplyr`
-  - `patchwork`
-  - `forcats`
-  - `knitr`
+
+| Package     | Purpose                                           |
+|------------|--------------------------------------------------|
+| `seqinr`   | Sequence analysis and codon usage calculations  |
+| `R.utils`  | General utility functions                        |
+| `ggplot2`  | Plotting and data visualisation                  |
+| `dplyr`    | Data manipulation                                |
+| `patchwork`| Combining multiple plots                          |
+| `forcats`  | Factor manipulation and ordering                 |
+| `knitr`    | Rendering HTML table                             |
 
 ## Quick Start Guide
 
