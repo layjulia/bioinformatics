@@ -17,10 +17,10 @@ Part 1 explores gene expression and long-term tree growth data. The table below 
 
 Part 1 input files from: https://github.com/ghazkha/Assessment4
 
-| Analysis | Input | Key Steps | Outputs |
-|----------|-------|-----------|---------|
-| **Gene Expression Analysis** | `gene_expression.tsv` – RNA-seq counts (3 samples) | - Import data<br>- Compute mean expression per gene<br>- Identify top 10 highly expressed genes<br>- Count genes with mean < 10<br>- Generate histogram of mean gene expression | Summary tables, top 10 gene list, histogram plot |
-| **Growth Data Analysis** | `growth_data.csv` – Tree circumference (2 sites, 20 years) | - Import and explore dataset<br>- Calculate mean & SD at start/end of study<br>- Visualise distributions with boxplots by site/time<br>- Compute mean growth over last 10 years<br>- Perform `t.test` for site differences | Summary statistics (mean ± SD), box plots of growth trends, p-values |
+| Analysis | Key Steps | Outputs |
+|----------|-----------|---------|
+| **Gene Expression** <br> (`gene_expression.tsv` – RNA-seq counts) | - Import data<br>- Compute mean expression per gene<br>- Identify top 10 highly expressed genes<br>- Count genes with mean < 10<br>- Generate histogram of mean gene expression | Summary tables, top 10 gene list, histogram plot |
+| **Growth Data Analysis** <br> (`growth_data.csv` – Tree circumference) | - Import and explore dataset<br>- Calculate mean & SD at start/end of study<br>- Visualise distributions with boxplots by site/time<br>- Compute mean growth over last 10 years<br>- Perform `t.test` for site differences | Summary statistics (mean ± SD), box plots of growth trends, p-values |
 
 ### Part 2: Examining biological sequence diversity
 
