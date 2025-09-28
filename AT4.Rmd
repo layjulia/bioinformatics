@@ -579,17 +579,33 @@ Note that we have 21 amino acids as **Stp** is the extra amino acid (stop codon)
 
 The below are relative synonymous codon usage (RSCU) charts for E. coli and A. aceti where all codons coding for each amino acid are represented in the boxes below the bar chart.
 ```{r}
-# Prepare data for plot
-dat_aaceti <- data.frame(Codon=c(rscu_table$codon),RSCU=c(rscu_table$RSCU_Aaceti),AA=c(rscu_table$AA))
-dat_ecoli <- data.frame(Codon=c(rscu_table$codon),RSCU=c(rscu_table$RSCU_Ecoli),AA=c(rscu_table$AA))
+# Extract Codon, RSCU values and Amino Acid (AA) from rscu_table
+dat_aaceti <- data.frame(
+  Codon = rscu_table$codon,
+  RSCU  = rscu_table$RSCU_Aaceti,
+  AA    = rscu_table$AA
+)
+
+dat_ecoli <- data.frame(
+  Codon = rscu_table$codon,
+  RSCU  = rscu_table$RSCU_Ecoli,
+  AA    = rscu_table$AA
+)
 
 # Create a column for fill colour of each codon
-dat_aaceti$Col=1
-dat_ecoli$Col=1
+dat_aaceti$Col <- 1
+dat_ecoli$Col <- 1
 
 # This populates the Col column with unique values for each codon coding an amino. Each value is a colour, therefore all amino acids will share the same values but the codons will be different.
-dat_aaceti=dat_aaceti %>% group_by(AA) %>% mutate(Col = lag(cumsum(Col), default = 0)) %>% mutate(Col =as.factor(Col))
-dat_ecoli=dat_ecoli %>% group_by(AA) %>% mutate(Col = lag(cumsum(Col), default = 0)) %>% mutate(Col =as.factor(Col))
+dat_aaceti <- dat_aaceti %>%
+  group_by(AA) %>%
+  mutate(Col = lag(cumsum(Col), default = 0),
+         Col = as.factor(Col))
+
+dat_ecoli <- dat_ecoli %>%
+  group_by(AA) %>%
+  mutate(Col = lag(cumsum(Col), default = 0),
+         Col = as.factor(Col))
 
 # Create bar plots - A. aceti
 p0 = ggplot(data=dat_aaceti, aes(x=AA, y=RSCU, fill=Col)) +
@@ -625,18 +641,17 @@ p3 = ggplot(data=dat_ecoli) +
   theme(legend.position="none") +
   guides(fill = "none")
 
-#Combine plots in a single plot for each organism
-plot_aaceti=p0/p1
-plot_ecoli=p2/p3
+# Bar plot (7 units tall) stacked on tile plot (1 unit tall)
+plot_aaceti <- (p0 / p1) + plot_layout(heights = c(7, 1))
+plot_ecoli  <- (p2 / p3) + plot_layout(heights = c(7, 1))
 
 #Set plot size. The ratio here is 7:1 - i.e. the bar plot is 7 times the height of the tile plot
 plot_aaceti=plot_aaceti+plot_layout(heights = c(7, 1))
 plot_ecoli=plot_ecoli+plot_layout(heights = c(7, 1))
 
-#print RSCU codon usage plot for A. aceti
-plot_aaceti
-#print RSCU codon usage plot for E. coli
-plot_ecoli
+# Print plots 
+plot_aaceti   # RSCU codon usage plot for A. aceti
+plot_ecoli    # RSCU codon usage plot for E. coli
 ```
 
 
