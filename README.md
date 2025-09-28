@@ -72,4 +72,5 @@ _A. aceti_ (GCA_002005445) is the allocated organism of interest and is compared
 
 ## Citations
 
-Citation Style Language (CSL): [Harvard (Deakin University)](https://www.zotero.org/styles?q=id%3Aharvard-deakin-university&format=author-date)
+* Bibliography(https://github.com/layjulia/bioinformatics/blob/main/references.bib)
+* Citation Style Language (CSL): [Harvard (Deakin University)](https://www.zotero.org/styles?q=id%3Aharvard-deakin-university&format=author-date)
