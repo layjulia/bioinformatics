@@ -63,6 +63,7 @@ _A. aceti_ (GCA_002005445) is the allocated organism of interest and is compared
 
 
 ## Requirements
+
 - **R**
 - R packages required:
   - `seqinr`
@@ -72,7 +73,14 @@ _A. aceti_ (GCA_002005445) is the allocated organism of interest and is compared
   - `patchwork`
   - `forcats`
   - `knitr`
-  
+
+## Quick Start Guide
+
+1. Clone the repository: `git clone https://github.com/layjulia/bioinformatics.git`
+2. Open `AT4.Rmd` in RStudio.
+3. Install required packages: `install.packages(c("seqinr","R.utils","ggplot2","dplyr","patchwork","forcats","knitr"))`
+4. Knit the R Markdown to HTML to reproduce the analyses
+
 ## Citations
 
 Citation Style Language (CSL): [Harvard (Deakin University)](https://www.zotero.org/styles?q=id%3Aharvard-deakin-university&format=author-date)
