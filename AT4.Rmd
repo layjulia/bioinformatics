@@ -229,7 +229,7 @@ t.test(growth10yr ~ Site, data = growth_data)
 
 **Organisms for comparison**
 
-In this section we are studying **Acetobacter aceti (GCA_002005445)** [@ensembl_aaceti] and comparing its sequence features to **E. coli (GCA_000005845)** [@ensembl_ecoli].
+In this section we are studying **Acetobacter aceti (GCA_002005445)** and comparing its sequence features to **E. coli (GCA_000005845)**.
 
 * **Acetobacter aceti:** Gram-negative bacterium known for production of acetic acid and used for converting ethanol into vinegar (acetic acid) [@Gomes2018].
 * **Escherichia coli:** Gram-negative bacterium. E. coli can ferment glucose to produce acetate, but this growth is inhibited by high acetate concentrations. It plays a role in the gut microbiota and in food production, but is also a common pathogen, causing a range of diseases [@Jang2017].
@@ -1011,8 +1011,6 @@ ggplot(k5_table, aes(x = Ecoli.rank, y = Aaceti.rank)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-Longer k-mers reduce the number of common sequences, which can lead to sparse counts and overfitting but less correlation mean it is easier to distinguish organism samples and possibly reflect biological function [@Moeckel2024]. Our rank/rank scatterplots for k = 3–5 illustrate this pattern: while 3-mers show broad correspondence between A. aceti and E. coli, 4-5-mers reveal a more "structured" pattern due to an abundance of *tied rankings* as some motifs do not exist or have zero values.
-
 ###### Correlation value calculation using Spearman's ρ
 
 Correlation values to show how strong the rank is can be done using the function `cor()` with the argument `method = "spearman"` to get **Spearman's ρ**, which is a standard measure of rank correlation [@soetewey_correlation_r]. We have already assigned ranks to the data points in our table in columns `Aaceti.rank` and `Ecoli.rank`. So then calculating the correlation between these ranks, results in a coefficient ranging from -1 to +1, where +1 is a perfect positive correlation and -1 is a perfect negative one.
@@ -1025,6 +1023,10 @@ cor(k4_table$Ecoli.rank, k4_table$Aaceti.rank, method = "spearman")
 #Spearman's ρ for 5-mer
 cor(k5_table$Ecoli.rank, k5_table$Aaceti.rank, method = "spearman")
 ```
+
+**Explanation of correlation values and scatterplot shape**
+
+Longer k-mers reduce the number of common sequences, which can lead to sparse counts and overfitting but less correlation mean it is easier to distinguish organism samples and possibly reflect biological function [@Moeckel2024]. Our rank/rank scatterplots for k = 3–5 illustrate this pattern: while 3-mers show broad correspondence between A. aceti and E. coli, 4-5-mers reveal a more "structured" pattern due to an abundance of *tied rankings* as some motifs do not exist or have zero values.
 
 ###### Barplots of 10 most frequent and 10 least frequent k-mers in A. aceti
 
