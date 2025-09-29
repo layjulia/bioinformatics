@@ -563,11 +563,12 @@ A codon is a three base triplet that codes for a particular amino acid. As there
 
 Relative Synonymous Codon Usage (RSCU) (called via `index=rscu`) is a measure as to how preferred a codon of a particular amino acid is compared to the other codons which also encode it.
 
-* RSCU = 1 means codon used as expected.
-* RSCU > 1 means codon is preferred.
-* RSCU < 1 means codon is under-represented.
+* *RSCU = 1* means codon used as expected.
+* *RSCU > 1* means codon is preferred.
+* *RSCU < 1* means codon is under-represented.
 
 We create a codon usage table to quantify the codon usage bias for both E. coli and A. aceti.
+
 ```{r}
 # Codon usage tables
 # Concatenate all CDS into one long sequence and get codon frequencies
@@ -599,7 +600,6 @@ knitr::kable(rscu_table,
              digits = 4) # rounds values to these decimal places
 ```
 
-
 ##### 2.5.2. Provide charts to support your observations.
 
 The following charts are provided for both organisms:
@@ -610,7 +610,7 @@ The following charts are provided for both organisms:
 
 **Codon Usage Bias Heatmap (RSCU values)**
 
-To further assist with visualisation of codon usage bias in both organisms, the below creates a heatmap for codon bias using `ggplot2`. Here the codons are aligned on the x-axis, with the organisms in the y-axis. We can compare the RSCU visually this way.
+To further assist with visualisation and comparing codon usage bias in both organisms, a heatmap for codon bias using `ggplot2` is shown below. Here the codons are aligned on the x-axis, with the organisms in the y-axis.
 
 ```{r}
 # add column called Organism to allow for labels
@@ -647,9 +647,9 @@ ggplot(rscu_all, aes(x = Codon, y = Organism, fill = RSCU)) +
 
 **Codon Usage Bias: Stacked Bar and Tile Charts**
 
-To better understand codon usage patterns, we grouped codons by their corresponding amino acids and calculated their relative synonymous codon usage (RSCU). The stacked bar charts highlight how frequently each codon is used for a given amino acid, making codon bias across amino acids clearer.
+To better understand codon usage patterns, we grouped codons by their corresponding amino acids and calculated their RSCU. The stacked bar charts highlight how frequently each codon is used for a given amino acid, making codon bias across amino acids clearer. The graphs are modelled after the RSCU graphs from *@Fourdrilis2018, Figure 3*.
 
-In addition, tile plots below each bar chart show all codons that encode the same amino acid. This provides a direct mapping between codons and their relative contributions within each amino acid group.
+In addition, tile plots below each bar chart show all codons that encode the same amino acid. This provides a direct mapping between codons and their relative contributions within each amino acid group. The same colors are used in the RSCU bar chart to represent the RSCU values of the respective codons.
 
 Note: The charts display 21 amino acids, where **Stp** represents the stop codons (TAA, TAG and TGA).
 
@@ -843,7 +843,7 @@ Both organisms exhibit codon usage bias, with some codons for the same amino aci
 
 #### 2.6. K-mer analysis 
 
-In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in your organism of interest. Are these k-mers also over- and under-represented in E. coli to a similar extent? Provide plots to support your observations. Why do you think these sequences are present at different levels in the genomes of these organisms?
+*In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in your organism of interest. Are these k-mers also over- and under-represented in E. coli to a similar extent? Provide plots to support your observations. Why do you think these sequences are present at different levels in the genomes of these organisms?*
 
 ##### 2.6.1. Finding the top 10 over and under represented k-mers in A. aceti for length 3-5
 
@@ -1011,6 +1011,8 @@ ggplot(k5_table, aes(x = Ecoli.rank, y = Aaceti.rank)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
+Longer k-mers reduce the number of common sequences, which can lead to sparse counts and overfitting but less correlation mean it is easier to distinguish organism samples and possibly reflect biological function [@Moeckel2024]. Our rank/rank scatterplots for k = 3–5 illustrate this pattern: while 3-mers show broad correspondence between A. aceti and E. coli, 4-5-mers reveal a more "structured" pattern due to an abundance of *tied rankings* as some motifs do not exist or have zero values.
+
 ###### Correlation value calculation using Spearman's ρ
 
 Correlation values to show how strong the rank is can be done using the function `cor()` with the argument `method = "spearman"` to get **Spearman's ρ**, which is a standard measure of rank correlation [@soetewey_correlation_r]. We have already assigned ranks to the data points in our table in columns `Aaceti.rank` and `Ecoli.rank`. So then calculating the correlation between these ranks, results in a coefficient ranging from -1 to +1, where +1 is a perfect positive correlation and -1 is a perfect negative one.
@@ -1102,36 +1104,38 @@ plot_kmer_comparison_split(aaceti_prot, ecoli_prot, aa1, aa, k=5)
 
 ##### 2.6.3. Are these k-mers also over- and under-represented in E. coli to a similar extent?
 
-We analysed the protein sequences of A. aceti and compared them to E. coli to identify k-mers (length 3–5 amino acids) that are significantly over- or under-represented in A. aceti. Frequencies were calculated relative to the total proteome to account for differences in proteome size.
+We analysed the protein sequences of A. aceti and compared them to E. coli to identify k-mers (length 3–5 amino acids) that are significantly over or under-represented in A. aceti. Frequencies were calculated relative to the total proteome to account for differences in proteome size.
 
 * **3-mer (ρ ~ 0.94)**
   * The ten most over-represented 3-mers in A. aceti include AAL, AAA, ALA, LAA, ALL, LLA, AGL, AAG, LAL, and LAG. 
-  * Most of these k-mers are also present in E. coli but at slightly lower frequencies, indicating a species-specific enrichment. 
+  * Most of these k-mers are also present in E. coli but at slightly lower frequencies.
   * Under-represented 3-mers include CMY, CQC, KCC, MCY, WKC, WWC, YCK, CCC, CCM, and CHW, which remain rare or absent in both organisms.
-  * For 3-mers, the correlation was very strong and a high correlation indicates that shorter motifs are largely conserved across the two gram-negative bacterium species.
+  * For 3-mers, the correlation was very strong and a high correlation indicates that shorter motifs are largely conserved across the two organisms.
 
 * **4-mer (ρ ~ 0.79)**
   * Over-represented 4-mers in A. aceti include AALA, ALAA, AAAA, LAAL, ALLA, AAAL, LAAA, LLAA, AGLA, and ALAL. 
   * Many of these 4-mers show modest representation in E. coli, but the enrichment in A. aceti suggests organism-specific sequence preferences.
-  * Under-represented 4-mers are mostly absent in A. aceti, while E. coli has very low but nonzero frequencies.
-  * This moderate correlation suggests some divergence in sequence patterns
+  * Under-represented 4-mers are mostly absent in A. aceti, while E. coli has very low but non-zero frequencies.
+  * This moderate correlation suggests some divergence in sequence patterns, indicating that longer k-mers may allow better capability of reflecting biological function of sequences [@Moeckel2024].
   
 * **5-mer (ρ ~ 0.31)**
   * The top 5-mers enriched in A. aceti include GKSTL, AALAA, VSSGG, AAAAL, AAALA, AAALG, ALAAG, LAAAL, LAALR, and AARAA.
   * Many of these sequences are either absent or extremely rare in E. coli, highlighting strong organism-specific over-representation.
   * Under-represented 5-mers are largely absent in A. aceti and present only at trace levels in E. coli.
-  * The weak correlation demonstrates that longer sequence contexts are highly species-specific. The rank 1 motif (GKSTL) was ranked top 1 across both organisms. However, bottom ranked sequences had very low correlation.
+  * The weak correlation demonstrates that longer sequence contexts are highly organism-specific. The rank 1 motif (GKSTL) was ranked top 1 across both gram-negative bacteria organisms.
   
 ##### 2.6.4. Why do you think these sequences are present at different levels in the genomes of these organisms?
 
+For smaller k-mer lengths, the sequence complexity is often too low to meaningfully distinguish long coding sequences, as the same k-mers frequently occur across genomes and multiple species [@Moeckel2024]. In comparison, longer k-mers mean too few common k-mers and overfitting problems due to sparse k-mer counts [@Chikhi2014]. However, longer k-mers can also represent a better differentiation between samples. For example, in A. aceti and E. coli, both gram-negative bacteria, we can see that they share a common rank one 5-mer of **GKSTL** but A. aceti's third ranked *VSSGG* is noticeably less present in E. coli.
+
 Factors influencing k-mer frequencies could be:
 
-  * **GC content:** the genome base composition as explored in questions 1-4 showed there could be different GC content which in turn can affect amino acid usage and recurring peptides [@Agashe2014]
+  * **GC content:** the genome base composition as explored in questions 1-4 showed there could be different GC content which in turn can affect amino acid usage and recurring peptides [@Agashe2014].
   * **Codon usage and amino acid frequencies:** organism specific codon bias as shown in question 5 can lead to more of certain amino acids and therefore their recurring short motifs (k-mers)
   * **Ecological niche:** adaptations to different environments may favor proteins with structural motifs that are more stable or functional under niche-specific conditions [@Hu2022]. E. coli lives in the gut, so its proteins might favor motifs aiding stress resistance and rapid growth [@DeBiase2015]. A. aceti likes acidic environments, possibly selecting for motifs stabilising proteins in low pH [@Gomes2018].
   * **Mutations and evolution over time:** over time, sequence composition may change due to selection and drift which could lead to some k-mers being amplified over others [@Bulmer1991].
 
-In summary, these factors explain why A. aceti shows enrichment of k-mers like AAL, AAA, and AALA, while other k-mers remain rare or absent compared to E. coli. The differences in k-mer presence and frequency could reflect the unique genetic histories and functional adaptations of E. coli and A. aceti which are shaped by factors like their preferred environment and genetic content.
+In summary, these factors may explain why A. aceti shows enrichment of k-mers like AAL, AAA, and AALA, while other k-mers remain rare or absent compared to E. coli. The differences in k-mer presence and frequency could reflect the unique genetic histories and functional adaptations of E. coli and A. aceti which are shaped by factors like their preferred environment and genetic content.
 
 ## Session Info
 
