@@ -973,7 +973,7 @@ The following plots are provided:
 * Rank/rank scatterplots
 * Barplots of 10 most frequent and 10 least frequent k-mers in A. aceti
 
-###### Rank/rank scatterplots
+**Rank/rank scatterplots**
 
 By ranking k-mer frequencies above, we can directly compare how similarly A. aceti and E. coli use particular motifs. A useful way to visualise this is with a **rank–rank scatterplot**, which plots the rank of each k-mer in one organism against its rank in the other. If a k-mer has a similar ranking in both organisms, the point will fall close to the red diagonal line. For instance, if the top-ranked k-mer in E. coli is also the top-ranked in A. aceti, it will lie exactly on the line. Points that deviate strongly from the line highlight k-mers with very different relative usage between the two proteomes. We will generate such scatterplots for k-mers of length 3, 4, and 5.
 
@@ -1011,7 +1011,7 @@ ggplot(k5_table, aes(x = Ecoli.rank, y = Aaceti.rank)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-###### Correlation value calculation using Spearman's ρ
+**Correlation value calculation using Spearman's ρ**
 
 Correlation values to show how strong the rank is can be done using the function `cor()` with the argument `method = "spearman"` to get **Spearman's ρ**, which is a standard measure of rank correlation [@soetewey_correlation_r]. We have already assigned ranks to the data points in our table in columns `Aaceti.rank` and `Ecoli.rank`. So then calculating the correlation between these ranks, results in a coefficient ranging from -1 to +1, where +1 is a perfect positive correlation and -1 is a perfect negative one.
 
@@ -1028,7 +1028,7 @@ cor(k5_table$Ecoli.rank, k5_table$Aaceti.rank, method = "spearman")
 
 Longer k-mers reduce the number of common sequences, which can lead to sparse counts and overfitting but less correlation mean it is easier to distinguish organism samples and possibly reflect biological function [@Moeckel2024]. Our rank/rank scatterplots for k = 3–5 illustrate this pattern: while 3-mers show broad correspondence between A. aceti and E. coli, 4-5-mers reveal a more "structured" pattern due to an abundance of *tied rankings* as some motifs do not exist or have zero values.
 
-###### Barplots of 10 most frequent and 10 least frequent k-mers in A. aceti
+**Barplots of 10 most frequent and 10 least frequent k-mers in A. aceti**
 
 For the top 10 highest and 10 lowest frequency kmers in A. aceti, we compare the frequencies with E. coli - i.e. for the same k-mer motif. We will use a function `plot_kmer_comparison_split` to graph for each k-mer (of length 3-5).
 
