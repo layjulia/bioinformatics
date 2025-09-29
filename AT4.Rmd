@@ -6,7 +6,7 @@ output:
   html_document:
     df_print: kable
     toc: true
-    toc_depth: 5
+    toc_depth: 4
     toc_float: true
 bibliography: "references.bib"
 csl: "harvard-deakin-university.csl"
@@ -15,7 +15,7 @@ csl: "harvard-deakin-university.csl"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## A. Install packages if required
+## A. Setup: Install packages if required
 
 ```{r install packages}
 # Function to check if packages are installed
@@ -49,7 +49,7 @@ install_if_missing(my_packages)
 ```
 
 
-## B. Load all required packages
+## B. Setup: Load all required packages
 
 Note that the `count()` function must be distinguished within code chunks as it exists in both `seqinr` and `dplyr`.
 
@@ -146,6 +146,7 @@ colnames(growth_data)
 ```
 
 #### 1.7. Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
+
 The sites available are either "northeast" or "southwest". Our columns suggest the start of the study period is 2005 and the end of the study is 2020. The below data frame contains a calculation of the mean and standard deviation for both sites at 2005 and 2020.
 
 ```{r}
@@ -163,6 +164,7 @@ stats
 ```
 
 #### 1.8. Make a box plot of tree circumference at the start and end of the study at both sites.
+
 The boxplot shows that the tree circumference at the end for both sites grew, with the northeast site showing more growth than the southwest site at the end of the study in 2020.
 
 ```{r}
@@ -194,8 +196,8 @@ boxplot(circumference ~ site_year,
 
 The mean growth over the last 10 years at each site is:
 
-* Northeast site: 42.94 cm
-* Southwest site: 35.49 cm
+* Northeast site: **42.94 cm**
+* Southwest site: **35.49 cm**
 
 ```{r}
 # Calculate 10-year growth per tree using 2020 and 2010
@@ -208,7 +210,7 @@ growth_summary <- aggregate(growth10yr ~ Site, data = growth_data, mean)
 growth_summary 
 ```
 
-We use `diff` on the `growth10yr` column to subtract the values. So, on average, trees at the northeast site grew *~7.45cm* more over the last 10 years than trees at the southwest site.
+We use `diff` on the `growth10yr` column to subtract the values. So, on average, trees at the northeast site grew **~7.45cm** more over the last 10 years than trees at the southwest site.
 
 ```{r}
 # subtract the growth10yr values from each other
@@ -225,32 +227,37 @@ t.test(growth10yr ~ Site, data = growth_data)
 
 ## 2: Examining biological sequence diversity
 
-##### Organisms for comparison
-In this section we are studying **Acetobacter aceti (GCA_002005445)** and comparing its sequence features to **E. coli (GCA_000005845).**
+**Organisms for comparison**
 
-* **Acetobacter aceti:** Gram-negative bacterium known for production of acetic acid and used for converting ethanol into vinegar (acetic acid).
-* **Escherichia coli:** Gram-negative bacterium. E. coli can ferment glucose to produce acetate, but this growth is inhibited by high acetate concentrations. It plays a role in the gut microbiota and in food production, but is also a common pathogen, causing a range of diseases. 
+In this section we are studying **Acetobacter aceti (GCA_002005445)** [@ensembl_aaceti] and comparing its sequence features to **E. coli (GCA_000005845)** [@ensembl_ecoli].
+
+* **Acetobacter aceti:** Gram-negative bacterium known for production of acetic acid and used for converting ethanol into vinegar (acetic acid) [@Gomes2018].
+* **Escherichia coli:** Gram-negative bacterium. E. coli can ferment glucose to produce acetate, but this growth is inhibited by high acetate concentrations. It plays a role in the gut microbiota and in food production, but is also a common pathogen, causing a range of diseases [@Jang2017].
 
 #### 2.1. Genome and CDS analysis
+
+*Download the whole set of coding DNA sequences for E. coli and your organism of interest. How many coding sequences are present in these organisms? Present this in the form of a table. Describe any differences between the two organisms.*
 
 ##### 2.1.1. Download the whole set of coding DNA sequences for E. coli and your organism of interest.
 
 Download both E. coli (GCA_000005845) and A. aceti (GCA_002005445) from Ensembl Bacteria.
 
 ```{r}
-#E. coli file download
+# E. coli file download
 URL="https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
 download.file(URL,destfile="ecoli_cds.fa.gz")
-#unzip and allow for overwrite if existing file
+
+# unzip and allow for overwrite if existing file
 gunzip("ecoli_cds.fa.gz", overwrite = TRUE)
 
-#A. aceti file download
+# A. aceti file download
 URL="https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_80_collection/acetobacter_aceti_gca_002005445/cds/Acetobacter_aceti_gca_002005445.ASM200544v1.cds.all.fa.gz"
 download.file(URL,destfile="aaceti_cds.fa.gz")
-#unzip
+
+# unzip and allow for overwrite if existing file
 gunzip("aaceti_cds.fa.gz", overwrite = TRUE)
 
-#display files in current folder to confirm download
+# display files in current folder to confirm download
 list.files()
 ```
 
@@ -282,9 +289,11 @@ As per the table, E. coli has **837** more coding sequences than A. aceti (4239 
 
 #### 2.2. Total coding DNA
 
+*How much coding DNA is there in total for these two organisms? Present this in the form of a table. Describe any differences between the two organisms.*
+
 ##### 2.2.1 How much coding DNA is there in total for these two organisms? Present this in the form of a table.
 
-We want all rows and first column in the cds files to be summed. This will be the total length of all genes.
+We want all rows and first column in the cds files to be summed. The table shows total Coding DNA in E. coli and A. aceti.
 
 ```{r}
 # Total coding DNA from the length column
@@ -301,10 +310,10 @@ DNA_total <- data.frame(
   Total_DNA = c(ecoli_total, aaceti_total)
 )
 
-# Print table
+# Print total coding DNA table
 DNA_total
 
-# Difference in Total_DNA
+# Difference in Total_DNA to show which organism has more coding DNA in absolute terms
 diff(DNA_total$Total_DNA)
 ```
 
@@ -314,7 +323,11 @@ The total coding DNA in E. coli is about **741,960** base pairs greater than in 
 
 #### 2.3. Coding sequence length, visualisation and analysis
 
-##### 2.3.1. Calculate the length of all coding sequences in these two organisms.
+*Calculate the length of all coding sequences in these two organisms. Make a boxplot of coding sequence length in these organisms. What is the mean and median coding sequence length of these two organisms? Describe any differences between the two organisms.*
+
+##### 2.3.1. Calculate the length of all coding sequences in these two organisms. What is the mean and median coding sequence length of these two organisms? 
+
+*Length of all coding sequences* as per Question 2 above (total DNA).
 
 Calculate the mean and median coding sequences then store it all in a data frame.
 
@@ -322,11 +335,12 @@ Calculate the mean and median coding sequences then store it all in a data frame
 # Calculate mean and median CDS length
 cds_stats <- data.frame(
   Organism = c("E. coli", "A. aceti"),
+  Length = c(ecoli_total, aaceti_total),
   Mean_CDS_Length = c(mean(ecoli_len), mean(aaceti_len)),
   Median_CDS_Length = c(median(ecoli_len), median(aaceti_len))
 )
 
-# Print table to show means and medians
+# Print table to show count, means and medians
 cds_stats
 
 #Calculate differences in mean and median coding sequences
@@ -335,6 +349,7 @@ diff(cds_stats$Median_CDS_Length)
 ```
 
 ##### 2.3.2. Make a boxplot of coding sequence length in these organisms.
+
 This is a boxplot for the CDS lengths of both organisms.
 
 ```{r}
@@ -356,7 +371,7 @@ boxplot(list("E. coli" = ecoli_len, "A. aceti" = aaceti_len),
 
 #### 2.4. Nucleotide and amino acid frequency
 
-Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence. Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.
+*Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence. Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.*
 
 ##### 2.4.1. Calculate the frequency of DNA bases in the total coding sequences for both organisms.
 
@@ -384,27 +399,24 @@ ecoli_nt_freq
 # Print relative frequencies for A. aceti
 aaceti_nt_freq
 ```
-##### 2.4.2. Create bar plots for nucleotide frequency.
+##### 2.4.2. Create bar plots for nucleotide frequency
 
-Using the frequencies stored in `ecoli_nt_freq` and `aaceti_nt_freq`, we create barplots to visualise the nucleotide composition.
+Using the frequencies stored in `ecoli_nt_freq` and `aaceti_nt_freq`, group barplots to visualise the nucleotide composition.
 
 ```{r}
-#Barplot for nucleotide frequencies of E. coli
-barplot(ecoli_nt_freq , 
-        xlab="Nucleotides", 
-        ylab="Proportion", 
-        main="E. coli CDS composition", 
-        las=1, # to make the labels horizontal only
-        col="skyblue")
-grid() #show gridlines
+# Combine data into a matrix
+nt_matrix <- rbind(ecoli_nt_freq, aaceti_nt_freq)
+colnames(nt_matrix) <- names(ecoli_nt_freq)
+rownames(nt_matrix) <- c("E. coli", "A. aceti")
 
-#Barplot for nucleotide frequencies of E. coli
-barplot(aaceti_nt_freq, 
-        xlab="Nucleotides", 
-        ylab="Proportion", 
-        main="A. aceti CDS composition", 
-        las=1, # to make the labels horizontal only
-        col="plum1")
+# Grouped barplot
+barplot(nt_matrix, beside = TRUE, 
+        col = c("skyblue", "plum1"),
+        xlab = "Nucleotides",
+        ylab = "Proportion",
+        main = "CDS Nucleotide Composition",
+        ylim = c(0, max(nt_matrix)*1.2))  # add 20% extra space on top
+legend("topright", legend = rownames(nt_matrix), fill = c("skyblue", "plum1"))
 grid()
 ```
 
@@ -444,100 +456,84 @@ ecoli_aa_count
 aaceti_aa_count
 ```
 
-##### 2.4.4. Create bar plots for amino acid count
+##### 2.4.4. Create bar plots for amino acid frequency
 
-The barplots show the frequency of protein sequences for both organisms as shown in `ecoli_aa_count` and `aaceti_aa_count`.
+We convert the count to relative frequencies in order to compare their composition with the same y-axis.
 
-```{r}
-# Protein amino acid frequencies
-barplot(ecoli_aa_count,
-        main="E. coli Amino Acid Count",
-        ylab="Count", 
-        xlab = "Amino Acid",
-        col="skyblue", 
-        las=1, # keep labels horizontal
-        cex.axis = 0.75, # Changes the size of axis tick mark annotations
-        cex.lab = 0.75, # Changes the size of x-axis and y-axis labels
-        cex = 0.75,
-        names.arg = names(ecoli_aa_count)) # add AA labels
-grid()
+##### Barplot side-by-side comparison of amino acid proportions
 
-barplot(aaceti_aa_count,
-        main = "A. aceti Amino Acid Count",
-        ylab = "Count",
-        xlab = "Amino Acid",
-        col = "plum1",
-        las = 1,
-        cex.axis = 0.75, # Changes the size of axis tick mark annotations
-        cex.lab = 0.75, # Changes the size of x-axis and y-axis labels
-        cex = 0.75,
-        names.arg = names(aaceti_aa_count))
-grid()
-```
-
-##### Side-by-side comparison of amino acid proportions
-
-Using `ggplot2` we do a side-by-side comparison of the two amino acid compositions. While both organisms display broadly similar distributions, we can see A. aceti shows higher proportions of alanine (A), glycine (G), proline (P), arginine (R), and serine (S), whereas E. coli is enriched in isoleucine (I), lysine (K), asparagine (N), and glutamine (Q).
+We do a side-by-side comparison of the two amino acid compositions using their relative frequencies. While both organisms display broadly similar distributions, we can see A. aceti shows higher proportions of alanine (A), glycine (G), proline (P), arginine (R), and serine (S), whereas E. coli is enriched in isoleucine (I), lysine (K), asparagine (N), and glutamine (Q).
 
 ```{r}
-# Convert to proportions to view together
+# Convert to proportions
 ecoli_aa_proportion <- seqinr::count(ecoli_prot,wordsize=1,alphabet=aa, freq = TRUE)
 aaceti_aa_proportion <- seqinr::count(aaceti_prot,wordsize=1,alphabet=aa1, freq = TRUE)
 
+# Combine proportions into a matrix
+aa_matrix <- rbind(E_coli = as.numeric(ecoli_aa_proportion),
+                   A_aceti = as.numeric(aaceti_aa_proportion))
+colnames(aa_matrix) <- names(ecoli_aa_proportion)  # amino acid labels
 
-# Merge into one data frame (long format for ggplot2)
-aa_df <- data.frame(
-  AA = names(ecoli_aa_proportion),
-  E_coli = as.numeric(ecoli_aa_proportion),
-  A_aceti = as.numeric(aaceti_aa_proportion)
-)
+# Side-by-side barplot
+barplot(aa_matrix, 
+        beside = TRUE, 
+        col = c("skyblue", "plum1"),
+        xlab = "Amino Acid",
+        ylab = "Proportion",
+        main = "Amino Acid Proportion Comparison",
+        ylim = c(0, max(aa_matrix)*1.2))  # extra space for legend
 
-# Reshape into long format
-aa_long <- reshape2::melt(aa_df, id.vars = "AA",
-                          variable.name = "Organism",
-                          value.name = "Proportion")
+# Add legend
+legend("topright", legend = rownames(aa_matrix), fill = c("skyblue", "plum1"))
 
-# Plot side-by-side comparison
-ggplot(aa_long, aes(x = AA, y = Proportion, fill = Organism)) +
-  geom_bar(stat = "identity", position = position_dodge()) +
-  labs(title = "Amino Acid Proportion Comparison",
-       x = "Amino Acid",
-       y = "Proportion") +
-  scale_fill_manual(values = c("skyblue", "plum1")) +
-  theme_minimal(base_size = 14)
+# Add gridlines
+grid()
 ```
 
 ##### Table to review nucleotide and amino acid proportions
 
-To compare the two organisms' nucleotides and amino acid sequences side-by-side, we use `knitr` to generate a clean html table.
+To compare the two organisms' nucleotides and amino acid sequences, we use `knitr` to generate a clean html table. The table contains a column for both the organisms' count and proportions.
 
 ```{r}
-# DNA nucleotide frequency table
+# DNA nucleotide frequency table with counts
 nt_freq_table <- data.frame(
   Base = union(names(ecoli_nt_freq), names(aaceti_nt_freq)),
-  E_coli = as.numeric(ecoli_nt_freq[union(names(ecoli_nt_freq), names(aaceti_nt_freq))]),
-  A_aceti = as.numeric(aaceti_nt_freq[union(names(ecoli_nt_freq), names(aaceti_nt_freq))])
+  E_coli_Count = as.numeric(ecoli_dna_composition[union(names(ecoli_nt_freq), names(aaceti_nt_freq))]),
+  A_aceti_Count = as.numeric(aaceti_dna_composition[union(names(ecoli_nt_freq), names(aaceti_nt_freq))]),
+  E_coli_Proportion = as.numeric(ecoli_nt_freq[union(names(ecoli_nt_freq), names(aaceti_nt_freq))]),
+  A_aceti_Proportion = as.numeric(aaceti_nt_freq[union(names(ecoli_nt_freq), names(aaceti_nt_freq))])
 )
 
 # Replace NAs with 0
 nt_freq_table[is.na(nt_freq_table)] <- 0
 
+# Render table
 knitr::kable(nt_freq_table, digits = 4,
-             col.names = c("Base", "E. coli (Proportion)", "A. aceti (Proportion)"))
+             col.names = c("Base",
+                           "E. coli (Count)", "A. aceti (Count)",
+                           "E. coli (Proportion)", "A. aceti (Proportion)"),
+             caption = "Nucleotide Counts and Proportions for E. coli and A. aceti")
 
-# Amino acid frequency table
+# Amino acid frequency table with counts
 aa_freq_table <- data.frame(
   AminoAcid = union(names(ecoli_aa_proportion), names(aaceti_aa_proportion)),
-  E_coli = as.numeric(ecoli_aa_proportion[union(names(ecoli_aa_proportion), names(aaceti_aa_proportion))]),
-  A_aceti = as.numeric(aaceti_aa_proportion[union(names(ecoli_aa_proportion), names(aaceti_aa_proportion))])
+  E_coli_Count = as.numeric(ecoli_aa_count[union(names(ecoli_aa_proportion), names(aaceti_aa_proportion))]),
+  A_aceti_Count = as.numeric(aaceti_aa_count[union(names(ecoli_aa_proportion), names(aaceti_aa_proportion))]),
+  E_coli_Proportion = as.numeric(ecoli_aa_proportion[union(names(ecoli_aa_proportion), names(aaceti_aa_proportion))]),
+  A_aceti_Proportion = as.numeric(aaceti_aa_proportion[union(names(ecoli_aa_proportion), names(aaceti_aa_proportion))])
 )
 
 # Replace NAs with 0
 aa_freq_table[is.na(aa_freq_table)] <- 0
 
-#generate table
+# Generate table with title
 knitr::kable(aa_freq_table, digits = 4,
-             col.names = c("Amino Acid", "E. coli (Proportion)", "A. aceti (Proportion)"))
+             col.names = c("Amino Acid", 
+                           "E. coli (Count)",
+                           "A. aceti (Count)",
+                           "E. coli (Proportion)", 
+                           "A. aceti (Proportion)"),
+             caption = "Amino Acid Counts and Proportions for E. coli and A. aceti")
 ```
 
 ##### 2.4.5. Describe any differences between the two organisms.
@@ -548,7 +544,7 @@ From our results regarding the frequency of DNA bases, we can see that E. coli a
 
 * Comparison of nucleotide composition shows that E. coli has a relatively balanced AT/GC content (around 48% AT, 52% GC)
 * A. aceti is more GC-rich (around 42% AT, 58% GC).
-* This indicates that A. aceti has a higher GC content compared to E. coli, which could potentially influence genome stability, codon usage (explored later in question 5) and possibly its gene expression.
+* This indicates that A. aceti has a higher GC content compared to E. coli, which could potentially influence genome stability, codon usage (explored later in question 5) and possibly its gene expression [@Agashe2014].
 
 **Amino Acid**
 
@@ -560,7 +556,7 @@ From our results regarding the frequency of DNA bases, we can see that E. coli a
 
 #### 2.5. Codon usage bias
 
-Create a codon usage table and quantify the codon usage bias among all coding sequences. Describe any differences between the two organisms with respect to their codon usage bias. Provide charts to support your observations.
+*Create a codon usage table and quantify the codon usage bias among all coding sequences. Describe any differences between the two organisms with respect to their codon usage bias. Provide charts to support your observations.*
 
 ##### 2.5.1. Create a codon usage table and quantify the codon usage bias among all coding sequences
 A codon is a three base triplet that codes for a particular amino acid. As there are 64 possible codons and just 20 amino acids (and 3 termination codons); some amino acids are coded by multiple codons. For example, leucine is coded by six codons that are synonymous for it. `seqinr` has a command called `uco` which calculates codon usage information.
@@ -605,6 +601,12 @@ knitr::kable(rscu_table,
 
 
 ##### 2.5.2. Provide charts to support your observations.
+
+The following charts are provided for both organisms:
+
+* Codon Usage Bias Heatmap
+* Stacked Bar and Tile Charts for Codon Usage
+* Bar Plots per Amino Acid and RSCU Values
 
 **Codon Usage Bias Heatmap (RSCU values)**
 
@@ -682,7 +684,7 @@ dat_ecoli <- dat_ecoli %>%
          Col = as.factor(Col))
 
 # Create bar plots - A. aceti
-p0 = ggplot(data=dat_aaceti, aes(x=AA, y=RSCU, fill=Col)) +
+p0 <- ggplot(data=dat_aaceti, aes(x=AA, y=RSCU, fill=Col)) +
   geom_bar(stat='identity') +
   theme_minimal() +
   theme(axis.title.x = element_blank()) +
@@ -691,7 +693,7 @@ p0 = ggplot(data=dat_aaceti, aes(x=AA, y=RSCU, fill=Col)) +
   theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))
 
 # Create tile plot - A. aceti
-p1 = ggplot(data=dat_aaceti) +
+p1 <- ggplot(data=dat_aaceti) +
   geom_tile(aes(x=AA, y=fct_rev(Col), fill=Col), col="white") +
   geom_text(aes(x=AA, y=Col, label=Codon), col="white", size=3.5) +
   theme_void() +
@@ -699,7 +701,7 @@ p1 = ggplot(data=dat_aaceti) +
   guides(fill = "none")
 
 # Create bar plots - E. coli
-p2 = ggplot(data=dat_ecoli, aes(x=AA, y=RSCU, fill=Col)) +
+p2 <- ggplot(data=dat_ecoli, aes(x=AA, y=RSCU, fill=Col)) +
   geom_bar(stat='identity') +
   theme_minimal() +
   theme(axis.title.x = element_blank()) +
@@ -715,17 +717,13 @@ p3 = ggplot(data=dat_ecoli) +
   theme(legend.position="none") +
   guides(fill = "none")
 
-# Bar plot (7 units tall) stacked on tile plot (1 unit tall)
-plot_aaceti <- (p0 / p1) + plot_layout(heights = c(7, 1))
-plot_ecoli  <- (p2 / p3) + plot_layout(heights = c(7, 1))
-
-#Set plot size. The ratio here is 7:1 - i.e. the bar plot is 7 times the height of the tile plot
-plot_aaceti=plot_aaceti+plot_layout(heights = c(7, 1))
-plot_ecoli=plot_ecoli+plot_layout(heights = c(7, 1))
+# Bar plot (7 units tall) stacked on tile plot (3 unit tall)
+plot_aaceti <- (p0 / p1) + plot_layout(heights = c(7, 3))
+plot_ecoli  <- (p2 / p3) + plot_layout(heights = c(7, 3))
 
 # Print plots 
-plot_aaceti   # RSCU codon usage plot for A. aceti
-plot_ecoli    # RSCU codon usage plot for E. coli
+plot_aaceti   # RSCU codon usage stacked bar plot for A. aceti
+plot_ecoli    # RSCU codon usage stacked bar plot for E. coli
 ```
 
 **Codon Usage Bias: Bar Plots per Amino Acid (RSCU Values) - A. aceti**
@@ -841,7 +839,7 @@ Both organisms exhibit codon usage bias, with some codons for the same amino aci
 * A. aceti displays a more balanced codon usage, for example, AAG is slightly preferred over AAA for Lys, CCC over CCG for Pro, and TGA is the dominant stop codon instead of TAA.
 * Other amino acids, such as Gly and Ala, show similar patterns in both organisms.
 * E. coli tends to have more extreme biases as clearly shown on our heatmap.
-* The differences may reflect organism-specific adaptations in protein structure, metabolic needs and protein translational efficiency. Our side-by-side barplots of amino acid proportions highlight these subtle but consistent shifts between the two species.
+* The differences may reflect organism-specific adaptations in protein structure, metabolic needs and protein translational efficiency. Our side-by-side barplots of amino acid proportions highlight these subtle but consistent shifts between the two species [@Bulmer1991].
 
 #### 2.6. K-mer analysis 
 
@@ -970,6 +968,11 @@ knitr::kable(
 
 ##### 2.6.2. Provide plots to support your observations.
 
+The following plots are provided:
+
+* Rank/rank scatterplots
+* Barplots of 10 most frequent and 10 least frequent k-mers in A. aceti
+
 ###### Rank/rank scatterplots
 
 By ranking k-mer frequencies above, we can directly compare how similarly A. aceti and E. coli use particular motifs. A useful way to visualise this is with a **rank–rank scatterplot**, which plots the rank of each k-mer in one organism against its rank in the other. If a k-mer has a similar ranking in both organisms, the point will fall close to the red diagonal line. For instance, if the top-ranked k-mer in E. coli is also the top-ranked in A. aceti, it will lie exactly on the line. Points that deviate strongly from the line highlight k-mers with very different relative usage between the two proteomes. We will generate such scatterplots for k-mers of length 3, 4, and 5.
@@ -985,6 +988,7 @@ ggplot(k3_table, aes(x = Ecoli.rank, y = Aaceti.rank)) +
 ```
 
 The rank/rank scatterplot for 4-mer shows that there is moderate correlation between ranks. Rank correlation is less strong than that of the shorter 3-mer.
+
 ```{r}
 ggplot(k4_table, aes(x = Ecoli.rank, y = Aaceti.rank)) +
   geom_point(alpha = 0.6, color = "seagreen") +
@@ -996,6 +1000,7 @@ ggplot(k4_table, aes(x = Ecoli.rank, y = Aaceti.rank)) +
 ```
 
 The scatterplot for 5-mers show the rank/rank correlation is weak which is expected as longer sequences could be species specific.
+
 ```{r}
 ggplot(k5_table, aes(x = Ecoli.rank, y = Aaceti.rank)) +
   geom_point(alpha = 0.6, color = "thistle4") +
@@ -1121,10 +1126,10 @@ We analysed the protein sequences of A. aceti and compared them to E. coli to id
 
 Factors influencing k-mer frequencies could be:
 
-  * **GC content:** the genome base composition as explored in questions 1-4 showed there could be different GC content which in turn can affect amino acid usage and recurring/repeated peptides
+  * **GC content:** the genome base composition as explored in questions 1-4 showed there could be different GC content which in turn can affect amino acid usage and recurring peptides [@Agashe2014]
   * **Codon usage and amino acid frequencies:** organism specific codon bias as shown in question 5 can lead to more of certain amino acids and therefore their recurring short motifs (k-mers)
-  * **Ecological niche:** adaptations to different environments may favor proteins with structural motifs that are more stable or functional under niche-specific conditions. E. coli lives in the gut, so its proteins might favor motifs aiding stress resistance and rapid growth. A. aceti likes acidic environments, possibly selecting for motifs stabilising proteins in low pH.
-  * **Mutations and evolution over time:** over time, sequence composition may change due to selection and drift which could lead to some k-mers being amplified over others.
+  * **Ecological niche:** adaptations to different environments may favor proteins with structural motifs that are more stable or functional under niche-specific conditions [@Hu2022]. E. coli lives in the gut, so its proteins might favor motifs aiding stress resistance and rapid growth [@DeBiase2015]. A. aceti likes acidic environments, possibly selecting for motifs stabilising proteins in low pH [@Gomes2018].
+  * **Mutations and evolution over time:** over time, sequence composition may change due to selection and drift which could lead to some k-mers being amplified over others [@Bulmer1991].
 
 In summary, these factors explain why A. aceti shows enrichment of k-mers like AAL, AAA, and AALA, while other k-mers remain rare or absent compared to E. coli. The differences in k-mer presence and frequency could reflect the unique genetic histories and functional adaptations of E. coli and A. aceti which are shaped by factors like their preferred environment and genetic content.
 
