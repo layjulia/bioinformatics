@@ -13,7 +13,7 @@ csl: "harvard-deakin-university.csl"
 ---
 ## A. Setup: Install packages if required
 
-```{r install packages, include=FALSE}
+```{r install packages}
 # Function to check if packages are installed
 # Install missing packages quietly
 install_if_missing <- function(pkgs) {
@@ -42,17 +42,13 @@ my_packages <- c(
 
 # Install any missing packages
 install_if_missing(my_packages)
-
-# Include all code chunks in rendered version
-knitr::opts_chunk$set(echo = TRUE)
 ```
-
 
 ## B. Setup: Load all required packages
 
 Note that the `count()` function must be distinguished within code chunks as it exists in both `seqinr` and `dplyr`.
 
-```{r loading packages, include=FALSE}
+```{r loading packages}
 suppressPackageStartupMessages({
   library("seqinr")
   library("R.utils")
@@ -62,6 +58,11 @@ suppressPackageStartupMessages({
   library("forcats")
   library("knitr")
 })
+```
+
+```{r set code chunk, include=FALSE}
+# Include all code chunks in rendered version
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
