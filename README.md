@@ -1,5 +1,5 @@
 # Bioinformatics R Project
-This repository contains R scripts and analyses exploring **gene expression, growth data, and biological sequence diversity** across selected organisms. The project also demonstrates how RStudio and Git can be used to implement reproducible **bioinformatics workflows and clear documentation**.
+This repository contains R scripts and analyses exploring **gene expression, growth data, and biological sequence diversity** across selected organisms. The project also demonstrates how RStudio and Git can be used to implement reproducible **bioinformatics analysis workflows and clear documentation**.
 
 ## Key Project Files
 | File | Description |
@@ -26,7 +26,7 @@ Part 1 explores gene expression and long-term tree growth data. The table below 
 
 ### Part 2: Examining biological sequence diversity
 
-_A. aceti_ (GCA_002005445) is the allocated organism of interest and is compared to the _E. coli_ (GCA_000005845) genome throughout. Differences in genome organisation, codon usage bias and protein sequence composition are discussed. Input files are complete coding DNA sequences (CDS) for *E. coli* and *A. aceti* available from:  
+_A. aceti_ (GCA_002005445) is the allocated organism of interest and is compared to the _E. coli_ (GCA_000005845) genome throughout. Differences in genome organisation, codon usage bias and protein sequence composition are discussed. Input files are complete coding DNA sequences (CDS) for *E. coli* and *A. aceti* were downloaded from [Ensembl Bacteria](https://bacteria.ensembl.org/index.html): 
 
 - [Acetobacter aceti (GCA_002005445)](https://bacteria.ensembl.org/Acetobacter_aceti_gca_002005445/Info/Index)
 - [Escherichia coli str. K-12 substr. MG1655 str. K12 (GCA_000005845)](https://bacteria.ensembl.org/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845/Info/Index/)
@@ -36,7 +36,7 @@ _A. aceti_ (GCA_002005445) is the allocated organism of interest and is compared
 | **Coding Sequence Counts** | Count CDS entries per organism | Table comparing CDS counts |
 | **Total Coding DNA** | Sum total coding length | Comparison table |
 | **CDS Length Distribution** | Plot CDS lengths, compute mean & median | Box plot and summary table |
-| **Base Composition & Amino Acid Frequencies** | Calculate nucleotide and amino acid proportions | Barplots of bases |
+| **Base Composition & Amino Acid Frequencies** | Calculate nucleotide and amino acid proportions | Barplots of nucleotides and amino acid composition |
 | **Codon Usage Bias** | Compute RSCU values, plot codon usage | Codon usage tables, heatmaps, barplots |
 | **K-mer Analysis (k=3–5)** | Identify over- and under-represented k-mers, compare across organisms | Frequency barplots, rank/rank scatterplots with correlation coefficients |
 
@@ -44,11 +44,13 @@ _A. aceti_ (GCA_002005445) is the allocated organism of interest and is compared
 - *E. coli* has more coding sequences than *A. aceti* and slightly lower GC content.  
 - *A. aceti* shows higher GC bias, which may influence codon usage and protein composition.  
 - Codon usage differs between organisms, reflecting organism-specific preferences.  
-- K-mer analysis highlights over- and under-represented motifs, suggesting differences in genome sequence patterns.
+- K-mer analysis highlights over and under-represented motifs, suggesting differences in genome sequence patterns.
+- Codon usage patterns between A. aceti and E. coli diverge more strongly as k-mer length increases.
 
 ## Requirements
 
 - **R**
+- IDE/Editor: **RStudio** (preferred)
 - R packages required:
 
 | Package     | Purpose                                           |
@@ -61,7 +63,7 @@ _A. aceti_ (GCA_002005445) is the allocated organism of interest and is compared
 | `forcats`  | Factor manipulation and ordering                 |
 | `knitr`    | Rendering HTML table                             |
 
-## Quick Start Guide
+## Quick Start
 
 1. Clone the repository: `git clone https://github.com/layjulia/bioinformatics.git`
 2. Open `AT4.Rmd` in RStudio.

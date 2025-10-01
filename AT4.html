@@ -2045,8 +2045,8 @@ list.files()</code></pre>
 ##  [5] &quot;bioinformatics.Rproj&quot;          &quot;ecoli_cds.fa&quot;                 
 ##  [7] &quot;gene_expression.tsv&quot;           &quot;growth_data.csv&quot;              
 ##  [9] &quot;harvard-deakin-university.csl&quot; &quot;LICENSE&quot;                      
-## [11] &quot;plot_aaceti.png&quot;               &quot;README.html&quot;                  
-## [13] &quot;README.md&quot;                     &quot;references.bib&quot;</code></pre>
+## [11] &quot;README.html&quot;                   &quot;README.md&quot;                    
+## [13] &quot;references.bib&quot;</code></pre>
 </div>
 <div id="how-many-coding-sequences-are-present-in-these-organisms-present-this-in-the-form-of-a-table." class="section level5">
 <h5>2.1.2. How many coding sequences are present in these organisms?
@@ -4350,12 +4350,12 @@ specific to A. aceti or shared with E. coli.</li>
 <li>One for the top 10 (most over-represented)</li>
 <li>Another for the bottom 10 (most under-represented)</li>
 </ul>
-<pre class="r"><code>plot_kmer_comparison_split &lt;- function(prot1, prot2, aa1, aa2, k = 3, top_n = 10,
+<pre class="r"><code>plot_kmer_comparison_split &lt;- function(prot1, prot2, a1, a2, k = 3, top_n = 10,
                                        org1_name=&quot;A. aceti&quot;, org2_name=&quot;E. coli&quot;) {
   
   # Count k-mers (frequency)
-  kmers1_freq &lt;- seqinr::count(prot1, wordsize = k, alphabet = aa1, freq = TRUE)
-  kmers2_freq &lt;- seqinr::count(prot2, wordsize = k, alphabet = aa2, freq = TRUE)
+  kmers1_freq &lt;- seqinr::count(prot1, wordsize = k, alphabet = a1, freq = TRUE)
+  kmers2_freq &lt;- seqinr::count(prot2, wordsize = k, alphabet = a2, freq = TRUE)
   
   # Convert to data frame
   kmer_table &lt;- data.frame(

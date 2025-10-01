@@ -1045,12 +1045,12 @@ The below graphs display:
 * Another for the bottom 10 (most under-represented)
 
 ```{r}
-plot_kmer_comparison_split <- function(prot1, prot2, aa1, aa2, k = 3, top_n = 10,
+plot_kmer_comparison_split <- function(prot1, prot2, a1, a2, k = 3, top_n = 10,
                                        org1_name="A. aceti", org2_name="E. coli") {
   
   # Count k-mers (frequency)
-  kmers1_freq <- seqinr::count(prot1, wordsize = k, alphabet = aa1, freq = TRUE)
-  kmers2_freq <- seqinr::count(prot2, wordsize = k, alphabet = aa2, freq = TRUE)
+  kmers1_freq <- seqinr::count(prot1, wordsize = k, alphabet = a1, freq = TRUE)
+  kmers2_freq <- seqinr::count(prot2, wordsize = k, alphabet = a2, freq = TRUE)
   
   # Convert to data frame
   kmer_table <- data.frame(
