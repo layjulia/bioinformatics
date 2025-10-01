@@ -11,13 +11,9 @@ output:
 bibliography: "references.bib"
 csl: "harvard-deakin-university.csl"
 ---
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ## A. Setup: Install packages if required
 
-```{r install packages}
+```{r install packages, include=FALSE}
 # Function to check if packages are installed
 # Install missing packages quietly
 install_if_missing <- function(pkgs) {
@@ -46,6 +42,9 @@ my_packages <- c(
 
 # Install any missing packages
 install_if_missing(my_packages)
+
+# Include all code chunks in rendered version
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
@@ -53,7 +52,7 @@ install_if_missing(my_packages)
 
 Note that the `count()` function must be distinguished within code chunks as it exists in both `seqinr` and `dplyr`.
 
-```{r loading packages}
+```{r loading packages, include=FALSE}
 suppressPackageStartupMessages({
   library("seqinr")
   library("R.utils")
@@ -64,6 +63,7 @@ suppressPackageStartupMessages({
   library("knitr")
 })
 ```
+
 
 ## 1. Gene Expression and Growth Data Analysis
 
@@ -684,7 +684,7 @@ dat_ecoli <- dat_ecoli %>%
          Col = as.factor(Col))
 
 # Create bar plots - A. aceti
-p0 <- ggplot(data=dat_aaceti, aes(x=AA, y=RSCU, fill=Col)) +
+Aaceti_bar <- ggplot(data=dat_aaceti, aes(x=AA, y=RSCU, fill=Col)) +
   geom_bar(stat='identity') +
   theme_minimal() +
   theme(axis.title.x = element_blank()) +
@@ -693,7 +693,7 @@ p0 <- ggplot(data=dat_aaceti, aes(x=AA, y=RSCU, fill=Col)) +
   theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))
 
 # Create tile plot - A. aceti
-p1 <- ggplot(data=dat_aaceti) +
+Aaceti_tile <- ggplot(data=dat_aaceti) +
   geom_tile(aes(x=AA, y=fct_rev(Col), fill=Col), col="white") +
   geom_text(aes(x=AA, y=Col, label=Codon), col="white", size=3.5) +
   theme_void() +
@@ -701,7 +701,7 @@ p1 <- ggplot(data=dat_aaceti) +
   guides(fill = "none")
 
 # Create bar plots - E. coli
-p2 <- ggplot(data=dat_ecoli, aes(x=AA, y=RSCU, fill=Col)) +
+Ecoli_bar <- ggplot(data=dat_ecoli, aes(x=AA, y=RSCU, fill=Col)) +
   geom_bar(stat='identity') +
   theme_minimal() +
   theme(axis.title.x = element_blank()) +
@@ -710,7 +710,7 @@ p2 <- ggplot(data=dat_ecoli, aes(x=AA, y=RSCU, fill=Col)) +
   theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))
 
 # Create tile plot - E. coli
-p3 = ggplot(data=dat_ecoli) +
+Ecoli_tile <- ggplot(data=dat_ecoli) +
   geom_tile(aes(x=AA, y=fct_rev(Col), fill=Col), col="white") +
   geom_text(aes(x=AA, y=Col, label=Codon), col="white", size=3.5) +
   theme_void() +
@@ -718,12 +718,12 @@ p3 = ggplot(data=dat_ecoli) +
   guides(fill = "none")
 
 # Bar plot (7 units tall) stacked on tile plot (3 unit tall)
-plot_aaceti <- (p0 / p1) + plot_layout(heights = c(7, 3))
-plot_ecoli  <- (p2 / p3) + plot_layout(heights = c(7, 3))
+stacked_plot_aaceti <- (Aaceti_bar / Aaceti_tile) + plot_layout(heights = c(7, 3))
+stacked_plot_ecoli  <- (Ecoli_bar / Ecoli_tile) + plot_layout(heights = c(7, 3))
 
 # Print plots 
-plot_aaceti   # RSCU codon usage stacked bar plot for A. aceti
-plot_ecoli    # RSCU codon usage stacked bar plot for E. coli
+stacked_plot_aaceti # RSCU codon usage stacked bar plot for A. aceti
+stacked_plot_ecoli # RSCU codon usage stacked bar plot for E. coli
 ```
 
 **Codon Usage Bias: Bar Plots per Amino Acid (RSCU Values) - A. aceti**
